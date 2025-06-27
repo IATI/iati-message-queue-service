@@ -1,0 +1,50 @@
+[project]
+name = "iati-message-queue-service-sample-python-apps"
+version = "0.0.1"
+requires-python = ">= 3.12"
+readme = "README.md"
+dependencies = [
+    "argparse",
+    "azure-servicebus",
+    "faker"
+]
+
+[project.optional-dependencies]
+dev = [
+    "isort",
+    "mypy",
+    "pytest",
+    "black",
+    "flake8",
+    "flake8-pyproject",
+    "types-requests",
+    "python-dotenv",
+    "pytest-watcher",
+    "types-toml"
+]
+
+[tool.pip-tools]
+strip-extras = true
+
+[tool.isort]
+py_version=312
+extend_skip = ['__pycache__', '.mypy_cache', '.ve', '.venv']
+skip_gitignore = true
+src_paths = ['src', 'tests']
+line_length = 119
+profile = "black"
+
+[tool.mypy]
+files=["src/"]
+mypy_path=["tests/"]
+
+[tool.flake8]
+max-line-length = 119
+extend_ignore = ['E203', 'W503', 'E275']
+exclude = ['__pycache__', '.mypy_cache', '.pytest_cache', '.ve', '.venv']
+max_complexity = 7
+
+[tool.black]
+line-length = 119
+target-version = ['py312']
+include='''src/.*/*.py$'''
