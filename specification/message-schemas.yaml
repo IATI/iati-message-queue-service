@@ -15,11 +15,16 @@ components:
         type: object
         required:
           - message_type
+          - message_date
           - dataset
         properties:
           message_type:
             type: string
             const: "DATASET_UPDATED"
+          message_date:
+            type: string
+            format: date-time
+            example: 2025-06-27T06:54:20+00:00
           dataset:
             type: object
             required:
@@ -42,14 +47,14 @@ components:
                 example: aidagcy-activity-3
               source_type:
                 type: string
-                enum: 
-                  - primary-source 
+                enum:
+                  - primary-source
                   - secondary-source
                 example: primary-source
               url:
                 type: string
                 format: url
-                example: https://www.example.org/datasets/activity3.xml                
+                example: https://www.example.org/datasets/activity3.xml
               last_url_update_date:
                 type: string
                 format: date-time
@@ -65,6 +70,33 @@ components:
               reporting_org_short_name:
                 type: string
                 example: aidagcy
+
+    dataset_deleted:
+      name: dataset_deleted
+      title: Message indicating that the registration info for a dataset has been deleted.
+      payload:
+        type: object
+        required:
+          - message_type
+          - message_date
+          - dataset
+        properties:
+          message_type:
+            type: string
+            const: "DATASET_DELETED"
+          message_date:
+            type: string
+            format: date-time
+            example: 2025-06-27T06:54:20+00:00
+          dataset:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: string
+                format: uuid
+                example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
 
     reporting_org_updated:
       name: reporting_org_updated
@@ -131,9 +163,9 @@ components:
               reporting_source_type:
                 type: string
                 example: primary-source
-                enum: 
-                  - primary-source 
-                  - secondary-source                
+                enum:
+                  - primary-source
+                  - secondary-source
               default_licence_id:
                 type: string
                 example: gpl-3.0
@@ -155,4 +187,31 @@ components:
               number_of_published_datasets:
                 type: number
                 format: int
-                example: 12            
+                example: 12
+
+    reporting_org_deleted:
+      name: reporting_org_deleted
+      title: Message indicating that the registration info for a reporting org has been deleted.
+      payload:
+        type: object
+        required:
+          - message_type
+          - message_date
+          - dataset
+        properties:
+          message_type:
+            type: string
+            const: "REPORTING_ORG_DELETED"
+          message_date:
+            type: string
+            format: date-time
+            example: 2025-06-27T06:54:20+00:00
+          reporting_org:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: string
+                format: uuid
+                example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
