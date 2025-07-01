@@ -1,0 +1,16 @@
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: YAML Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the Repository
+        uses: actions/checkout@v4
+
+      - name: Run YAML Lint
+        env:
+          REPORT_ONLY: true
+          SHOW_ERRORS: true
+        run: bash <(curl -s https://raw.githubusercontent.com/CICDToolbox/yaml-lint/master/pipeline.sh)
