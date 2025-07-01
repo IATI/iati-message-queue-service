@@ -1,8 +1,11 @@
+---
 asyncapi: 3.0.0
 info:
   title: IATI Internal Message Queue Service Common Components
   version: 0.0.1
-  description: Definition of common components needed by apps using the IATI internal message queue service.
+  description: |
+    Definition of common components needed by apps using the IATI internal
+    message queue service.
 
 defaultContentType: application/json
 
@@ -10,7 +13,9 @@ components:
   messages:
     dataset_updated:
       name: dataset_updated
-      title: Message indicating that the registration info for a dataset has been updated.
+      title: |
+        Message indicating that the registration info for a dataset has been
+        updated.
       payload:
         type: object
         required:
@@ -73,7 +78,9 @@ components:
 
     dataset_deleted:
       name: dataset_deleted
-      title: Message indicating that the registration info for a dataset has been deleted.
+      title: |
+        Message indicating that the registration info for a dataset has been
+        deleted.
       payload:
         type: object
         required:
@@ -100,7 +107,9 @@ components:
 
     reporting_org_updated:
       name: reporting_org_updated
-      title: Message indicating that the registration info for a reporting org has been updated.
+      title: |
+        Message indicating that the registration info for a reporting org has
+        been updated.
       payload:
         type: object
         required:
@@ -191,7 +200,9 @@ components:
 
     reporting_org_deleted:
       name: reporting_org_deleted
-      title: Message indicating that the registration info for a reporting org has been deleted.
+      title: |
+        Message indicating that the registration info for a reporting org has
+        been deleted.
       payload:
         type: object
         required:

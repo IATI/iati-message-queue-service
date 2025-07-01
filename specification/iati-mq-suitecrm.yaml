@@ -1,3 +1,4 @@
+---
 asyncapi: 3.0.0
 info:
   title: IATI SuiteCRM Message Queue Usage
@@ -10,7 +11,7 @@ servers:
   iati-mq-test-amqp:
     title: IATI Message Queue Service
     summary: IATI Message Queue Service over AMQPS
-    description: | 
+    description: |
       Shared access keys available in Azure portal. Topic name goes in username, api key in password.
     host: iati-mq-test.servicebus.windows.net
     protocol: amqps
@@ -21,7 +22,7 @@ servers:
   iati-mq-test-https:
     title: IATI Message Queue Service
     summary: IATI Message Queue Service using Azure's REST HTTP API
-    description: | 
+    description: |
       Shared access keys available in Azure portal.
     externalDocs:
       url: https://learn.microsoft.com/en-us/rest/api/servicebus/
