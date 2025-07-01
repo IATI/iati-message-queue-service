@@ -43,8 +43,12 @@ channels:
     messages:
       dataset_updated:
         $ref: './message-schemas.yaml#/components/messages/dataset_updated'
+      dataset_deleted:
+        $ref: './message-schemas.yaml#/components/messages/dataset_deleted'        
       reporting_org_updated:
-        $ref: './message-schemas.yaml#/components/messages/reporting_org_updated'        
+        $ref: './message-schemas.yaml#/components/messages/reporting_org_updated'
+      reporting_org_deleted:
+        $ref: './message-schemas.yaml#/components/messages/reporting_org_deleted'
 
 operations:
   receive_update:
