@@ -1,0 +1,13 @@
+---
+
+extends: default
+
+ignore: |
+  register-your-data-api.yaml
+  archived-rabbitmq-setup
+
+rules:
+  line-length:
+    max: 119
+  truthy:
+    check-keys: false

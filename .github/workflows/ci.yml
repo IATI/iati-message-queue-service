@@ -1,7 +1,7 @@
+---
 name: Run CI tasks
 
-on: 
-  pull_request:
+on: [pull_request]
 
 jobs:
   build:
@@ -12,7 +12,8 @@ jobs:
       - name: Checkout the Repository
         uses: actions/checkout@v4
 
-      - name: Run YAML Lint
-        env:
-          SHOW_ERRORS: true
-        run: bash <(curl -s https://raw.githubusercontent.com/CICDToolbox/yaml-lint/master/pipeline.sh)
+      - name: Install yamllint
+        run: pip install yamllint
+
+      - name: Lint YAML files
+        run: "yamllint ."
