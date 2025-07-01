@@ -1,4 +1,8 @@
-on: [push, pull_request]
+name: Run CI tasks
+
+on: 
+  push:
+  pull_request:
 
 jobs:
   build:
