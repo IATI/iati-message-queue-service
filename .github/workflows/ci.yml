@@ -1,7 +1,6 @@
 name: Run CI tasks
 
 on: 
-  push:
   pull_request:
 
 jobs:
@@ -15,6 +14,5 @@ jobs:
 
       - name: Run YAML Lint
         env:
-          REPORT_ONLY: true
           SHOW_ERRORS: true
         run: bash <(curl -s https://raw.githubusercontent.com/CICDToolbox/yaml-lint/master/pipeline.sh)
