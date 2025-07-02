@@ -2,7 +2,7 @@
 asyncapi: 3.0.0
 info:
   title: IATI Message Queue Consumer Usage
-  version: 0.0.1
+  version: 0.0.2
   description: |
     Specification of how the IATI Dashboard (or other clients) receive update
     messages from SuiteCRM.

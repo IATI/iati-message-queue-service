@@ -2,7 +2,7 @@
 asyncapi: 3.0.0
 info:
   title: IATI SuiteCRM Message Queue Usage
-  version: 0.0.1
+  version: 0.0.2
   description: Specification of how the IATI CRM pushes messages to the Dashbaord and Data Getter.
 
 defaultContentType: application/json
