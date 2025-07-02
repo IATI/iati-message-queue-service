@@ -16,6 +16,15 @@ components:
       title: |
         Message indicating that the registration info for a dataset has been
         updated.
+      headers:
+        type: object
+        properties:
+          message_type:
+            type: string
+            const: "DATASET_UPDATED"
+            description: |
+              This is set as a key/value pair in the custom user properties (in
+              the Azure library it's the `application_properties` parameter).
       payload:
         type: object
         required:
@@ -81,6 +90,15 @@ components:
       title: |
         Message indicating that the registration info for a dataset has been
         deleted.
+      headers:
+        type: object
+        properties:
+          message_type:
+            type: string
+            const: "DATASET_DELETED"
+            description: |
+              This is set as a key/value pair in the custom user properties (in
+              the Azure library it's the `application_properties` parameter).
       payload:
         type: object
         required:
@@ -110,15 +128,29 @@ components:
       title: |
         Message indicating that the registration info for a reporting org has
         been updated.
+      headers:
+        type: object
+        properties:
+          message_type:
+            type: string
+            const: "REPORTING_ORG_UPDATED"
+            description: |
+              This is set as a key/value pair in the custom user properties (in
+              the Azure library it's the `application_properties` parameter).
       payload:
         type: object
         required:
           - message_type
+          - message_date
           - reporting_org
         properties:
           message_type:
             type: string
             const: "REPORTING_ORG_UPDATED"
+          message_date:
+            type: string
+            format: date-time
+            example: 2025-06-27T06:54:20+00:00
           reporting_org:
             type: object
             required:
@@ -203,6 +235,15 @@ components:
       title: |
         Message indicating that the registration info for a reporting org has
         been deleted.
+      headers:
+        type: object
+        properties:
+          message_type:
+            type: string
+            const: "REPORTING_ORG_DELETED"
+            description: |
+              This is set as a key/value pair in the custom user properties (in
+              the Azure library it's the `application_properties` parameter).
       payload:
         type: object
         required:
