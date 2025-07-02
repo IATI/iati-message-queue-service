@@ -1,0 +1,22 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Consumer - service loop",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "sample-python-apps/src/consumer_azsb_library.py",
+            "args": [
+                "--num-messages-to-receive",
+                "2",
+                "--run-as-service-loop",
+            ],
+            "console": "integratedTerminal",
+            "envFile": "${workspaceFolder}/sample-python-apps/.env"
+        },
+
+    ]
+}
