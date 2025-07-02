@@ -26,14 +26,50 @@ to send and receive, so you can use the same key for both sample apps.
 To send a message using a Python client that uses the Azure Service Bus library:
 
 ```bash
-dotenv python src/producer_azsb_library.py --update-message-type dataset
+dotenv python src/producer_azsb_library.py --update-record-type dataset --update-type delete
 
-dotenv python src/producer_azsb_library.py --update-message-type reporting_org
+dotenv python src/producer_azsb_library.py --update-record-type reporting_org --update-type update
+```
+
+You can also specify a given UUID to use for the main data item which is helpful
+if you want to test against known data:
+
+```bash
+dotenv python src/producer_azsb_library.py --update-record-type reporting_org \
+                                           --update-type update \
+                                           --uuid-to-use bd87b5e6-1704-4dcc-9979-efd54358bb2b
 ```
 
 To receive some messages:
 
 ```bash
 dotenv python src/consumer_azsb_library.py --num-messages-to-receive 5
+```
+
+## Development on the samples
+
+If you change the dev dependencies, recompile the development dependencies:
+
+```bash
+pip-compile --upgrade --extra dev -o requirements-dev.txt pyproject.toml
+```
+
+If you change the code, install the dev dependencies so `isort`, `black`, etc
+can be run:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+Running the linters:
+
+```bash
+isort .
+
+black src
+
+mypy
+
+flake8 src
 ```
 
