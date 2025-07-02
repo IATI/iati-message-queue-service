@@ -1,8 +1,0 @@
-README.md
-pyproject.toml
-src/producer.py
-src/iati_message_queue_service_sample_python_apps.egg-info/PKG-INFO
-src/iati_message_queue_service_sample_python_apps.egg-info/SOURCES.txt
-src/iati_message_queue_service_sample_python_apps.egg-info/dependency_links.txt
-src/iati_message_queue_service_sample_python_apps.egg-info/requires.txt
-src/iati_message_queue_service_sample_python_apps.egg-info/top_level.txt
