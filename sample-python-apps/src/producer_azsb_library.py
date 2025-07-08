@@ -66,7 +66,7 @@ def generate_sample_dataset_update_message(uuid_to_use: str | None = None):
     return {
         "message_type": "DATASET_UPDATED",
         "message_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "reporting_org": {
+        "dataset": {
             "id": uuid_to_use if uuid_to_use is not None else str(uuid.uuid4()),
             "short_name": dataset,
             "source_type": "primary-source" if randint(0, 10) > 5 else "secondary-source",
