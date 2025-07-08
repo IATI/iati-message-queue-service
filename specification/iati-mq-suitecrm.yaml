@@ -2,7 +2,7 @@
 asyncapi: 3.0.0
 info:
   title: IATI SuiteCRM Message Queue Usage
-  version: 0.0.2
+  version: 0.0.3
   description: Specification of how the IATI CRM pushes messages to the Dashbaord and Data Getter.
 
 defaultContentType: application/json
@@ -34,18 +34,23 @@ servers:
         scheme: SharedAccessSignatures
 
 channels:
-  registry_record_updates:
-    title: IATI Registry Data Updates
-    summary: The channel were updates to IATI Registry records are sent.
+  registry_record_changes:
+    title: IATI Registry Record Changes
+    summary: Channel where updates to IATI Registry dataset and reporting_org records are sent.
     description: |
-      In Azure Service Bus, the channel is the queue name or topic name, in the case of the IATI
-      setup topics are used, because they allow pub/sub delivery.
-    address: iati-mq-registry-update-topic-test
+      In Azure Service Bus, the channel name is the queue, topic or subscription
+      name, depending on setup and client. IATI uses topics/subscriptions, as
+      that allows for pub/sub.
+    address: iati-mq-registry-changes-topic-test
     messages:
+      dataset_created:
+        $ref: './message-schemas.yaml#/components/messages/dataset_created'
       dataset_updated:
         $ref: './message-schemas.yaml#/components/messages/dataset_updated'
       dataset_deleted:
         $ref: './message-schemas.yaml#/components/messages/dataset_deleted'
+      reporting_org_created:
+        $ref: './message-schemas.yaml#/components/messages/reporting_org_created'
       reporting_org_updated:
         $ref: './message-schemas.yaml#/components/messages/reporting_org_updated'
       reporting_org_deleted:
@@ -55,4 +60,4 @@ operations:
   send_update:
     action: send
     channel:
-      $ref: '#/channels/registry_record_updates'
+      $ref: '#/channels/registry_record_changes'

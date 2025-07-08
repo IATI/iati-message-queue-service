@@ -2,7 +2,7 @@
 asyncapi: 3.0.0
 info:
   title: IATI Internal Message Queue Service Common Components
-  version: 0.0.2
+  version: 0.0.3
   description: |
     Definition of common components needed by apps using the IATI internal
     message queue service.
@@ -11,6 +11,37 @@ defaultContentType: application/json
 
 components:
   messages:
+    dataset_created:
+      name: dataset_created
+      title: |
+        Message indicating that the registration info for a dataset has been
+        created.
+      headers:
+        type: object
+        properties:
+          message_type:
+            type: string
+            const: "DATASET_CREATED"
+            description: |
+              This is set as a key/value pair in the custom user properties (in
+              the Azure library it's the `application_properties` parameter).
+      payload:
+        type: object
+        required:
+          - message_type
+          - message_date
+          - dataset
+        properties:
+          message_type:
+            type: string
+            const: "DATASET_CREATED"
+          message_date:
+            type: string
+            format: date-time
+            example: 2025-06-27T06:54:20+00:00
+          dataset:
+            $ref: "#/components/schemas/dataset"
+
     dataset_updated:
       name: dataset_updated
       title: |
@@ -40,50 +71,7 @@ components:
             format: date-time
             example: 2025-06-27T06:54:20+00:00
           dataset:
-            type: object
-            required:
-              - id
-              - short_name
-              - source_type
-              - url
-              - last_url_update_date
-              - last_metadata_update_date
-              - licence_id
-              - reporting_org_id
-              - reporting_org_short_name
-            properties:
-              id:
-                type: string
-                format: uuid
-                example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
-              short_name:
-                type: string
-                example: aidagcy-activity-3
-              source_type:
-                type: string
-                enum:
-                  - primary-source
-                  - secondary-source
-                example: primary-source
-              url:
-                type: string
-                format: url
-                example: https://www.example.org/datasets/activity3.xml
-              last_url_update_date:
-                type: string
-                format: date-time
-                example: 2025-06-27T06:54:20+00:00
-              last_metadata_update_date:
-                type: string
-                format: date-time
-                example: 2025-06-27T06:54:20+00:00
-              reporting_org_id:
-                type: string
-                format: uuid
-                example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
-              reporting_org_short_name:
-                type: string
-                example: aidagcy
+            $ref: "#/components/schemas/dataset"
 
     dataset_deleted:
       name: dataset_deleted
@@ -123,6 +111,37 @@ components:
                 format: uuid
                 example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
 
+    reporting_org_created:
+      name: reporting_org_created
+      title: |
+        Message indicating that a reporting org has been created on the
+        Registry.
+      headers:
+        type: object
+        properties:
+          message_type:
+            type: string
+            const: "REPORTING_ORG_CREATED"
+            description: |
+              This is set as a key/value pair in the custom user properties (in
+              the Azure library it's the `application_properties` parameter).
+      payload:
+        type: object
+        required:
+          - message_type
+          - message_date
+          - reporting_org
+        properties:
+          message_type:
+            type: string
+            const: "REPORTING_ORG_CREATED"
+          message_date:
+            type: string
+            format: date-time
+            example: 2025-06-27T06:54:20+00:00
+          reporting_org:
+            $ref: "#/components/schemas/reporting_org"
+
     reporting_org_updated:
       name: reporting_org_updated
       title: |
@@ -152,83 +171,7 @@ components:
             format: date-time
             example: 2025-06-27T06:54:20+00:00
           reporting_org:
-            type: object
-            required:
-              - id
-              - short_name
-              - human_readable_name
-              - hq_country
-              - region
-              - iati_organisation_identifier
-              - iati_organisation_type
-              - data_portal_url
-              - exclusions_policy_url
-              - reporting_source_type
-              - default_licence_id
-              - contact_email
-              - address
-              - phone
-              - first_publication_date
-              - number_of_publisher_datasets
-            properties:
-              id:
-                type: string
-                format: uuid
-                example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
-              short_name:
-                type: string
-                example: aidagcy
-              human_readable_name:
-                type: string
-                example: Aid Agency
-              hq_country:
-                type: string
-                example: Colombia
-              region:
-                type: string
-                example: South America, regional
-              iati_organisation_identifier:
-                type: string
-                example: CO-ABC-123456
-              iati_organisation_type:
-                type: string
-                example: Regional NGO
-              data_portal_url:
-                type: string
-                format: url
-                example: https://www.example.org/data-portal
-              exclusions_policy_url:
-                type: string
-                format: url
-                example: https://www.example.org/exclusions-policy
-              reporting_source_type:
-                type: string
-                example: primary-source
-                enum:
-                  - primary-source
-                  - secondary-source
-              default_licence_id:
-                type: string
-                example: gpl-3.0
-              contact_email:
-                type: string
-                format: email
-                example: org.admin@example.org
-              address:
-                type: string
-                example: Fake Address
-              phone:
-                type: string
-                format: phone
-                example: 123-4567-8901
-              first_publication_date:
-                type: string
-                format: date-time
-                example: 2025-06-27T07:31:06+00:00
-              number_of_published_datasets:
-                type: number
-                format: int
-                example: 12
+            $ref: "#/components/schemas/reporting_org"
 
     reporting_org_deleted:
       name: reporting_org_deleted
@@ -267,3 +210,131 @@ components:
                 type: string
                 format: uuid
                 example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
+
+  schemas:
+    dataset:
+      title: An IATI Registry dataset record.
+      type: object
+      required:
+        - id
+        - short_name
+        - source_type
+        - url
+        - last_url_update_date
+        - last_metadata_update_date
+        - licence_id
+        - reporting_org_id
+        - reporting_org_short_name
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
+        short_name:
+          type: string
+          example: aidagcy-activity-3
+        source_type:
+          type: string
+          enum:
+            - primary-source
+            - secondary-source
+          example: primary-source
+        url:
+          type: string
+          format: url
+          example: https://www.example.org/datasets/activity3.xml
+        last_url_update_date:
+          type: string
+          format: date-time
+          example: 2025-06-27T06:54:20+00:00
+        last_metadata_update_date:
+          type: string
+          format: date-time
+          example: 2025-06-27T06:54:20+00:00
+        reporting_org_id:
+          type: string
+          format: uuid
+          example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
+        reporting_org_short_name:
+          type: string
+          example: aidagcy
+
+    reporting_org:
+      title: An IATI Registry reporting_org record.
+      type: object
+      required:
+        - id
+        - short_name
+        - human_readable_name
+        - hq_country
+        - region
+        - iati_organisation_identifier
+        - iati_organisation_type
+        - data_portal_url
+        - exclusions_policy_url
+        - reporting_source_type
+        - default_licence_id
+        - contact_email
+        - address
+        - phone
+        - first_publication_date
+        - number_of_publisher_datasets
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
+        short_name:
+          type: string
+          example: aidagcy
+        human_readable_name:
+          type: string
+          example: Aid Agency
+        hq_country:
+          type: string
+          example: Colombia
+        region:
+          type: string
+          example: South America, regional
+        iati_organisation_identifier:
+          type: string
+          example: CO-ABC-123456
+        iati_organisation_type:
+          type: string
+          example: Regional NGO
+        data_portal_url:
+          type: string
+          format: url
+          example: https://www.example.org/data-portal
+        exclusions_policy_url:
+          type: string
+          format: url
+          example: https://www.example.org/exclusions-policy
+        reporting_source_type:
+          type: string
+          example: primary-source
+          enum:
+            - primary-source
+            - secondary-source
+        default_licence_id:
+          type: string
+          example: gpl-3.0
+        contact_email:
+          type: string
+          format: email
+          example: org.admin@example.org
+        address:
+          type: string
+          example: Fake Address
+        phone:
+          type: string
+          format: phone
+          example: 123-4567-8901
+        first_publication_date:
+          type: string
+          format: date-time
+          example: 2025-06-27T07:31:06+00:00
+        number_of_published_datasets:
+          type: number
+          format: int
+          example: 12
