@@ -1,11 +1,12 @@
 [project]
 name = "iati-message-queue-service-sample-python-apps"
-version = "0.0.2"
+version = "0.0.3"
 requires-python = ">= 3.12"
 readme = "README.md"
 dependencies = [
     "argparse",
     "azure-servicebus",
+    "faker"
 ]
 
 [project.optional-dependencies]
