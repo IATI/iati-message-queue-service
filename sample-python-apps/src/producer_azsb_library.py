@@ -37,8 +37,12 @@ def generate_sample_delete_message(record_type_to_delete: str, uuid_to_use: str 
     }
 
 
-def generate_sample_reporting_org_message(update_type: str, reporting_org_uuid: str | None = None, reporting_org_short_name: str | None = None):
-    reporting_org_short_name_calc = reporting_org_short_name if reporting_org_short_name is not None else get_sample_reporting_org_short_name()
+def generate_sample_reporting_org_message(
+    update_type: str, reporting_org_uuid: str | None = None, reporting_org_short_name: str | None = None
+):
+    reporting_org_short_name_calc = (
+        reporting_org_short_name if reporting_org_short_name is not None else get_sample_reporting_org_short_name()
+    )
     reporting_org_name = reporting_org_short_name_calc.replace("-", " ").title()
 
     return {
@@ -66,19 +70,22 @@ def generate_sample_reporting_org_message(update_type: str, reporting_org_uuid: 
 
 
 def generate_sample_dataset_message(
-    update_type: str, dataset_uuid: str | None = None, reporting_org_uuid: str | None = None
+    update_type: str,
+    dataset_uuid: str | None = None,
+    dataset_short_name: str | None = None,
+    reporting_org_uuid: str | None = None,
 ):
     reporting_org = get_sample_reporting_org_short_name()
-    dataset = get_sample_dataset_short_name(reporting_org)
+    dataset_sample_short_name = get_sample_dataset_short_name(reporting_org)
 
     return {
         "message_type": f"DATASET_{update_type.upper()}",
         "message_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
         "dataset": {
             "id": dataset_uuid if dataset_uuid is not None else str(uuid.uuid4()),
-            "short_name": dataset,
+            "short_name": dataset_short_name if dataset_short_name is not None else dataset_sample_short_name,
             "source_type": "primary-source" if randint(0, 10) > 5 else "secondary-source",
-            "url": "https://www.example.org/{}.xml".format(dataset),
+            "url": "https://www.example.org/{}.xml".format(dataset_sample_short_name),
             "last_url_update_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
             "last_metadata_update_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
             "reporting_org_id": reporting_org_uuid if reporting_org_uuid is not None else str(uuid.uuid4()),
@@ -88,14 +95,21 @@ def generate_sample_dataset_message(
 
 
 def generate_example_payload(
-    update_type: str, update_record_type: str, dataset_uuid: str, reporting_org_uuid: str, reporting_org_short_name: str
+    update_type: str,
+    update_record_type: str,
+    dataset_uuid: str,
+    dataset_short_name: str,
+    reporting_org_uuid: str,
+    reporting_org_short_name: str,
 ) -> dict:
     if update_type == "deleted":
         primary_uuid = dataset_uuid if update_record_type == "dataset" else reporting_org_uuid
         payload = generate_sample_delete_message(update_record_type, primary_uuid)
     else:
         if update_record_type == "dataset":
-            payload = generate_sample_dataset_message(update_type, dataset_uuid, reporting_org_uuid)
+            payload = generate_sample_dataset_message(
+                update_type, dataset_uuid, dataset_short_name, reporting_org_uuid
+            )
         else:
             payload = generate_sample_reporting_org_message(update_type, reporting_org_uuid, reporting_org_short_name)
     return payload
@@ -105,11 +119,14 @@ async def send_single_message(
     update_type: str,
     update_record_type: str,
     dataset_uuid: str,
+    dataset_short_name: str,
     reporting_org_uuid: str,
     reporting_org_short_name: str,
     topic_sender: ServiceBusSender,
 ):
-    msg_payload = generate_example_payload(update_type, update_record_type, dataset_uuid, reporting_org_uuid, reporting_org_short_name)
+    msg_payload = generate_example_payload(
+        update_type, update_record_type, dataset_uuid, dataset_short_name, reporting_org_uuid, reporting_org_short_name
+    )
     msg_payload_as_str = json.dumps(msg_payload, indent=2)
     message = ServiceBusMessage(
         body=msg_payload_as_str, application_properties={"message_type": msg_payload["message_type"]}
@@ -117,7 +134,7 @@ async def send_single_message(
     await topic_sender.send_messages(message)
     output = {
         "info": "Generated and sent a sample {} {} message".format(update_type, update_record_type),
-        "message_payload" : msg_payload
+        "message_payload": msg_payload,
     }
     print(json.dumps(output, indent=2))
 
@@ -129,7 +146,13 @@ async def main(args: argparse.Namespace):
     servicebus_client = ServiceBusClient.from_connection_string(conn_str=conn_str, logging_enable=True)
     topic_sender = servicebus_client.get_topic_sender(topic_name=topic_name)
     await send_single_message(
-        args.update_type, args.update_record_type, args.dataset_uuid, args.reporting_org_uuid, args.reporting_org_short_name, topic_sender
+        args.update_type,
+        args.update_record_type,
+        args.dataset_uuid,
+        args.dataset_short_name,
+        args.reporting_org_uuid,
+        args.reporting_org_short_name,
+        topic_sender,
     )
 
 
@@ -152,6 +175,12 @@ if __name__ == "__main__":
         type=str,
         required=False,
         help="Use the specified UUID in for the dataset id",
+    )
+    parser.add_argument(
+        "--dataset-short-name",
+        type=str,
+        required=False,
+        help="Use the specified short-name for the dataset",
     )
     parser.add_argument(
         "--reporting-org-uuid",
