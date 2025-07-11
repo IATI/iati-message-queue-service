@@ -1,0 +1,45 @@
+@startuml IATI Message Queue Service and Connected Apps
+scale 2000*1600
+
+!include <azure/AzureCommon>
+!include <azure/Compute/AzureFunction>
+!include <azure/Containers/AzureContainerInstance>
+!include <azure/Integration/AzureServiceBus>
+!include <azure/Databases/AzureDatabaseForPostgreSQL>
+!include <azure/Storage/AzureBlobStorage>
+
+AzureServiceBus(IATIMessageQueueService, "\nIATI Message Queue Service", "iati-mq-INSTANCE")
+
+AzureContainerInstance(BulkDataService, "\nBulk Data Service", "bulk-data-service-INSTANCE")
+
+AzureFunction(DataDownloader, "\nData Downloader", "")
+
+AzureBlobStorage(IATIXMLCache, "\nIATI XML Cache", "bulk-data.iatistadnard.org")
+
+AzureDatabaseForPostgreSQL(BDSPersistentStorage, "Bulk Data Service Persistent Data Storage", "")
+
+component SuiteCRM
+
+component Dashboard
+
+SuiteCRM -down-> IATIMessageQueueService : publish:\n<<registry-changes-topic>>\nDATASET_CREATED,\nDATASET_UPDATED,\nDATASET_DELETED,\n\nREPORTING_ORG_CREATED,\nREPORTING_ORG_UPDATED,\nREPORTING_ORG_DELETED
+
+Dashboard -left-( IATIMessageQueueService : consume:\n<<registry-changes-sub-dashboard>>\nDATASET_CREATED,\nDATASET_UPDATED,\nDATASET_DELETED,\n\nREPORTING_ORG_CREATED,\nREPORTING_ORG_UPDATED,\nREPORTING_ORG_DELETED
+
+BulkDataService --( IATIMessageQueueService : consume:\n<<registry-changes-sub-data-getter>>\nDATASET_CREATED,\nDATASET_UPDATED,\nDATASET_DELETED,\n\nREPORTING_ORG_CREATED,\nREPORTING_ORG_UPDATED,\nREPORTING_ORG_DELETED
+
+BulkDataService -up-( IATIMessageQueueService : consume:\n<<download-attempts-sub>>\nDOWNLOAD_ATTEMPT_RESULT
+
+BulkDataService -up--> IATIMessageQueueService : publish:\n<<downloader-queue>>\n<<downloader-high-priority-queue>>\nDOWNLOAD_REQUIRED
+
+BulkDataService --> IATIXMLCache : upload bulk ZIP
+
+BulkDataService <--> BDSPersistentStorage : save state
+
+DataDownloader -right-( IATIMessageQueueService : consume:\n<<downloader-queue>>\n<<downloader-high-priority-queue>>\nDOWNLOAD_REQUIRED
+
+DataDownloader -right-> IATIMessageQueueService : publish:\n<<download-attempts-topic>>\nDOWNLOAD_ATTEMPT_RESULT
+
+DataDownloader -down-> IATIXMLCache : upload individual\nIATI datasets\n(XML and ZIP)
+
+@enduml
