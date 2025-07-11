@@ -239,6 +239,9 @@ components:
             - primary-source
             - secondary-source
           example: primary-source
+        licence_id:
+          type: string
+          example: gpl-3.0
         url:
           type: string
           format: url
