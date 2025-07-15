@@ -17,22 +17,36 @@ async def serviceloop(context: dict):
 
 
 async def receive_some_messages(context: dict):
+
     try:
         async with ServiceBusClient.from_connection_string(
             conn_str=context["connection_string"], logging_enable=True
         ) as servicebus_client:
             async with servicebus_client:
                 receiver = servicebus_client.get_subscription_receiver(
-                    topic_name=context["topic_name"], subscription_name=context["subscription_name"], max_wait_time=2
+                    topic_name=context["topic_name"],
+                    subscription_name=context["subscription_name"],
+                    max_wait_time=2,
+                    mode=context["mode"],
                 )
                 async with receiver:
-                    received_msgs = await receiver.receive_messages(
-                        max_wait_time=2, max_message_count=args.num_messages_to_receive
-                    )
-                    for msg in received_msgs:
-                        print("Message received: ")
-                        print(str(msg))
-                        await receiver.complete_message(msg)  # complete message, so removed from queue/topic
+                    if context["mode"] == "PEEK_LOCK":
+                        received_msgs = await receiver.peek_messages(
+                            max_message_count=context["num_messages_to_receive"]
+                        )
+                        for msg in received_msgs:
+                            print("Message peeked:")
+                            print(str(msg))
+                            # await receiver.abandon_message(msg)
+                    else:
+                        received_msgs = await receiver.receive_messages(
+                            max_wait_time=2, max_message_count=context["num_messages_to_receive"]
+                        )
+                        for msg in received_msgs:
+                            print("Message received: ")
+                            print(str(msg))
+                            await receiver.complete_message(msg)
+
     except asyncio.CancelledError:
         raise
 
@@ -51,6 +65,12 @@ if __name__ == "__main__":
         required=False,
         help="Run forever, waiting and receiving messages",
     )
+    parser.add_argument(
+        "--mode",
+        choices=["peek", "receive"],
+        required=False,
+        help="Mode = peek, view messages; receive = receive and delete",
+    )
 
     args = parser.parse_args()
 
@@ -59,6 +79,7 @@ if __name__ == "__main__":
         "topic_name": os.getenv("AZ_SERVICE_BUS_TOPIC_NAME"),
         "subscription_name": os.getenv("AZ_SERVICE_BUS_SUBSCRIPTION_NAME"),
         "num_messages_to_receive": args.num_messages_to_receive,
+        "mode": "PEEK_LOCK" if args.mode == "peek" else "RECEIVE_AND_DELETE",
     }
 
     if args.run_as_service_loop:
