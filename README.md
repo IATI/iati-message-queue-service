@@ -1,5 +1,16 @@
 # IATI Message Queue Service
 
+## Summary
+
+| Product          | IATI Message Queue Service |
+| ---------------- | --------------------------------- |
+| Description      | The specification for the internal message queue service that is used by several IATI products to communicate with each other |
+| Website          | n/a  |
+| Related          | |
+| Documentation    | Links to differnt parts of docs are below |
+| Technical Issues | See https://github.com/IATI/iati-message-queue-service/issues |
+| Support          | https://iatistandard.org/en/guidance/get-support/  |
+
 ## Specification
 
 Proposed specification for IATI message queue/service bus for communication
