@@ -26,6 +26,11 @@ def get_sample_dataset_short_name(reporting_org: str):
     return "{}-{}".format(reporting_org, get_sample_name(2))
 
 
+def get_sample_dataset_licence_id() -> str:
+    licences = ["cc-by", "gfdl", "odc-by", "uk-ogl"]
+    return licences[randint(0, len(licences) - 1)]
+
+
 def generate_sample_delete_message(record_type_to_delete: str, uuid_to_use: str | None = None) -> dict:
 
     return {
@@ -85,6 +90,7 @@ def generate_sample_dataset_message(
             "id": dataset_uuid if dataset_uuid is not None else str(uuid.uuid4()),
             "short_name": dataset_short_name if dataset_short_name is not None else dataset_sample_short_name,
             "source_type": "primary-source" if randint(0, 10) > 5 else "secondary-source",
+            "licence_id": get_sample_dataset_licence_id(),
             "url": "https://www.example.org/{}.xml".format(dataset_sample_short_name),
             "last_url_update_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
             "last_metadata_update_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),

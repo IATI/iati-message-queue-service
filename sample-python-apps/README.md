@@ -26,9 +26,9 @@ to send and receive, so you can use the same key for both sample apps.
 To send a message using a Python client that uses the Azure Service Bus library:
 
 ```bash
-dotenv python src/producer_azsb_library.py --update-record-type dataset --update-type delete
+dotenv python src/producer_azsb_library.py --update-record-type dataset --update-type deleted
 
-dotenv python src/producer_azsb_library.py --update-record-type reporting_org --update-type update
+dotenv python src/producer_azsb_library.py --update-record-type reporting_org --update-type updated
 ```
 
 You can also specify a given UUID to use for the main data item which is helpful
@@ -36,8 +36,8 @@ if you want to test against known data:
 
 ```bash
 dotenv python src/producer_azsb_library.py --update-record-type reporting_org \
-                                           --update-type update \
-                                           --uuid-to-use bd87b5e6-1704-4dcc-9979-efd54358bb2b
+                                           --update-type updated \
+                                           --dataset-uuid bd87b5e6-1704-4dcc-9979-efd54358bb2b
 ```
 
 To receive some messages:
