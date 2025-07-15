@@ -5,7 +5,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    name: YAML Lint
+    name: YAML Linting and Python Code Checking
     runs-on: ubuntu-latest
 
     steps:
@@ -17,3 +17,28 @@ jobs:
 
       - name: Lint YAML files
         run: "yamllint ."
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Install requirements
+        run: pip install -r requirements-dev.txt
+        working-directory: sample-python-apps
+
+      - name: Linting with Flake8
+        run: flake8
+        working-directory: sample-python-apps
+
+      - name: Linting with Black
+        run: black . --check
+        working-directory: sample-python-apps
+
+      - name: Linting with Isort
+        run: isort . --check-only
+        working-directory: sample-python-apps
+
+      - name: Type checking with MyPy
+        run: mypy .
+        working-directory: sample-python-apps

@@ -18,6 +18,8 @@ charset-normalizer==3.4.2
     # via requests
 click==8.2.1
     # via black
+faker==37.4.2
+    # via iati-message-queue-service-sample-python-apps (pyproject.toml)
 flake8==7.3.0
     # via
     #   flake8-pyproject
@@ -75,6 +77,8 @@ typing-extensions==4.14.0
     #   azure-core
     #   azure-servicebus
     #   mypy
+tzdata==2025.2
+    # via faker
 urllib3==2.5.0
     # via
     #   requests
