@@ -13,9 +13,13 @@ components:
   messages:
     dataset_created:
       name: dataset_created
-      title: |
-        Message indicating that the registration info for a dataset has been
-        created.
+      title: Notification that a dataset has been created.
+      summary: |
+        Message indicating that a dataset record has been deleted on the
+        Registry. The `message_id` serves to identify the message type is not
+        itself part of the message, but this message must contain an application
+        header called `message_type` that contains the `DATASET_CREATED` in
+        uppercase.
       headers:
         type: object
         properties:
@@ -23,8 +27,9 @@ components:
             type: string
             const: "DATASET_CREATED"
             description: |
-              This is set as a key/value pair in the custom user properties (in
-              the Azure library it's the `application_properties` parameter).
+              This is set as a key/value pair as the custom application headers
+              (in the Azure library it's the `application_properties`
+              parameter).
       payload:
         type: object
         required:
@@ -44,9 +49,13 @@ components:
 
     dataset_updated:
       name: dataset_updated
-      title: |
-        Message indicating that the registration info for a dataset has been
-        updated.
+      title: Notification that a dataset has been updated.
+      summary: |
+        Message indicating that a dataset record has been deleted on the
+        Registry. The `message_id` serves to identify the message type is not
+        itself part of the message, but this message must contain an application
+        header called `message_type` that contains the `DATASET_UPDATED` in
+        uppercase.
       headers:
         type: object
         properties:
@@ -54,8 +63,9 @@ components:
             type: string
             const: "DATASET_UPDATED"
             description: |
-              This is set as a key/value pair in the custom user properties (in
-              the Azure library it's the `application_properties` parameter).
+              This is set as a key/value pair as the custom application headers
+              (in the Azure library it's the `application_properties`
+              parameter).
       payload:
         type: object
         required:
@@ -75,9 +85,13 @@ components:
 
     dataset_deleted:
       name: dataset_deleted
-      title: |
-        Message indicating that the registration info for a dataset has been
-        deleted.
+      title: Notification that a dataset has been deleted.
+      summary: |
+        Message indicating that a dataset record has been deleted on the
+        Registry. The `message_id` serves to identify the message type is not
+        itself part of the message, but this message must contain an application
+        header called `message_type` that contains the `DATASET_DELETED` in
+        uppercase.
       headers:
         type: object
         properties:
@@ -85,8 +99,9 @@ components:
             type: string
             const: "DATASET_DELETED"
             description: |
-              This is set as a key/value pair in the custom user properties (in
-              the Azure library it's the `application_properties` parameter).
+              This is set as a key/value pair as the custom application headers
+              (in the Azure library it's the `application_properties`
+              parameter).
       payload:
         type: object
         required:
@@ -113,9 +128,13 @@ components:
 
     reporting_org_created:
       name: reporting_org_created
-      title: |
-        Message indicating that a reporting org has been created on the
-        Registry.
+      title: Notification that a reporting org has been created.
+      summary: |
+        Message indicating that a dataset record has been deleted on the
+        Registry. The `message_id` serves to identify the message type is not
+        itself part of the message, but this message must contain an application
+        header called `message_type` that contains the `REPORTING_ORG_CREATED`
+        in uppercase.
       headers:
         type: object
         properties:
@@ -123,8 +142,9 @@ components:
             type: string
             const: "REPORTING_ORG_CREATED"
             description: |
-              This is set as a key/value pair in the custom user properties (in
-              the Azure library it's the `application_properties` parameter).
+              This is set as a key/value pair as the custom application headers
+              (in the Azure library it's the `application_properties`
+              parameter).
       payload:
         type: object
         required:
@@ -144,9 +164,13 @@ components:
 
     reporting_org_updated:
       name: reporting_org_updated
-      title: |
-        Message indicating that the registration info for a reporting org has
-        been updated.
+      title: Notification that a reporting org has been updated.
+      summary: |
+        Message indicating that a reporting_org record has been updated on the
+        Registry. The `message_id` serves to identify the message type is not
+        itself part of the message, but this message must contain an application
+        header called `message_type` that contains the `REPORTING_ORG_UPDATED`
+        in uppercase.
       headers:
         type: object
         properties:
@@ -154,8 +178,9 @@ components:
             type: string
             const: "REPORTING_ORG_UPDATED"
             description: |
-              This is set as a key/value pair in the custom user properties (in
-              the Azure library it's the `application_properties` parameter).
+              This is set as a key/value pair as the custom application headers
+              (in the Azure library it's the `application_properties`
+              parameter).
       payload:
         type: object
         required:
@@ -175,9 +200,13 @@ components:
 
     reporting_org_deleted:
       name: reporting_org_deleted
-      title: |
-        Message indicating that the registration info for a reporting org has
-        been deleted.
+      title: Notification that a reporting org has been deleted.
+      summary: |
+        Message indicating that a reporting_org record has been deleted on the
+        Registry. The `message_id` serves to identify the message type is not
+        itself part of the message, but this message must contain an application
+        header called `message_type` that contains the `REPORTING_ORG_DELETED`
+        in uppercase.
       headers:
         type: object
         properties:
@@ -185,8 +214,9 @@ components:
             type: string
             const: "REPORTING_ORG_DELETED"
             description: |
-              This is set as a key/value pair in the custom user properties (in
-              the Azure library it's the `application_properties` parameter).
+              This is set as a key/value pair as the custom application headers
+              (in the Azure library it's the `application_properties`
+              parameter).
       payload:
         type: object
         required:

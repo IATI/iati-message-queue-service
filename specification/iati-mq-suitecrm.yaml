@@ -2,8 +2,8 @@
 asyncapi: 3.0.0
 info:
   title: IATI SuiteCRM Message Queue Usage
-  version: 0.0.3
-  description: Specification of how the IATI CRM pushes messages to the Dashbaord and Data Getter.
+  version: 0.0.4
+  description: Specification of how the IATI Registry pushes messages to the Dashbaord and Data Getter.
 
 defaultContentType: application/json
 
@@ -12,7 +12,13 @@ servers:
     title: IATI Message Queue Service
     summary: IATI Message Queue Service over AMQPS
     description: |
-      Shared access keys available in Azure portal. Topic name goes in username, api key in password.
+      When connecting using a 3rd party AMQPS client, the topic name goes in
+      username, api key in password.
+
+      When connecting using the Azure Service Bus Python library, connections
+      are made using `Endpoint=sb://` connection strings that are available in
+      the Azure portal and which incorporate Shared Access Keys. Go to: Azure
+      portal > Service Bus Namespace > Topic > Shared access policies.
     host: iati-mq-test.servicebus.windows.net
     protocol: amqps
     security:
@@ -36,11 +42,15 @@ servers:
 channels:
   registry_record_changes:
     title: IATI Registry Record Changes
-    summary: Channel where updates to IATI Registry dataset and reporting_org records are sent.
+    summary: The topic where notifications of changes to IATI Registry records are sent.
     description: |
-      In Azure Service Bus, the channel name is the queue, topic or subscription
-      name, depending on setup and client. IATI uses topics/subscriptions, as
-      that allows for pub/sub.
+      The address above (`iati-mq-registry-changes-topic-test`) is the Azure
+      Service Bus *topic* to which the Registry sends notification of changes to
+      datasets and reporting orgs. Service Bus delivers messages received to
+      this topic to several *subscriptions*. The general form of the *topic*
+      name is `iati-mq-registry-changes-topic-INSTANCE`, where `INSTANCE` is to
+      be replaced with one of `test`, `dev`, and `prod`, as per the typical IATI
+      server setup. (Currently only `test` is active).
     address: iati-mq-registry-changes-topic-test
     messages:
       dataset_created:
@@ -57,7 +67,12 @@ channels:
         $ref: './message-schemas.yaml#/components/messages/reporting_org_deleted'
 
 operations:
-  send_update:
+  send_record_change:
+    title: A record change notification sent from the Registry.
+    description: |
+      The operation ID `send_record_change` is to uniquely identify operations,
+      when a channel supports more than one. It does not need to appear anywhere
+      in the message sent.
     action: send
     channel:
       $ref: '#/channels/registry_record_changes'
