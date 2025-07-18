@@ -6,22 +6,52 @@
 | ---------------- | --------------------------------- |
 | Description      | The specification for the internal message queue service that is used by several IATI products to communicate with each other |
 | Website          | n/a  |
-| Related          | |
-| Documentation    | Links to differnt parts of docs are below |
+| Related          | [IATI Registry SuiteCRM Extension](https://github.com/IATI/iati-registry-suitecrm-extension)|
+| Documentation    | This README and the docs it links to below |
 | Technical Issues | See https://github.com/IATI/iati-message-queue-service/issues |
 | Support          | https://iatistandard.org/en/guidance/get-support/  |
 
-## Specification
+## Overview diagram
 
-Proposed specification for IATI message queue/service bus for communication
-between CRM/Registry, Dashboard, Data Getter (spec in AsyncAPI format):
+The IATI Message Queue Service is an instance of the Azure Service Bus messaging
+platform. It is provisioned and configured using the IATI OpenTofu setup.
 
-* Specs for SuiteCRM (producer): [YAML](./specification/iati-mq-suitecrm.yaml), [Rendered HTML](https://htmlpreview.github.io/?https://github.com/IATI/iati-message-queue-service/blob/develop/docs/specification-mq-suitecrm/index.html) (external
-  preview
-  tool).
-* Specs for Dashboard and other consumers: [YAML](./specification/iati-mq-clients.yaml), [Rendered HTML](https://htmlpreview.github.io/?https://github.com/IATI/iati-message-queue-service/blob/develop/docs/specification-mq-clients/index.html) (external
-  preview
-  tool).
+The component overview diagram below shows which internal IATI components
+communicate with each other using the IATI Message Queue Service, as well as the
+message types they send or receive:
+
+![IATI internal component over diagram](docs/iati-message-queue-service-and-apps-overview.png)
+
+This diagram is generated from the following PlantUML file
+[iati-message-queue-service-and-apps-overview](docs/iati-message-queue-service-and-apps-overview.puml).
+
+
+## Specifications
+
+Proposed/draft specifications for the various application interfaces to the IATI
+message queue/service bus that facilitates internal communication between IATI
+apps, specifically the CRM/Registry, Dashboard, Bulk Data Service, and Data
+Downloader. For each service interface there is an
+[AsyncAPI](https://www.asyncapi.com/en) specification written in YAML.
+
+
+* Registry Changes Producer (SuiteCRM): [YAML](./specification/iati-mq-suitecrm.yaml),
+  [Rendered
+  HTML](https://htmlpreview.github.io/?https://github.com/IATI/iati-message-queue-service/blob/develop/docs/specification-mq-suitecrm/index.html)
+  (external preview tool).
+
+* Registry Changes Consumer (Dashboard and Bulk Data Service/Data Getter):
+  [YAML](./specification/iati-mq-clients.yaml), [Rendered
+  HTML](https://htmlpreview.github.io/?https://github.com/IATI/iati-message-queue-service/blob/develop/docs/specification-mq-clients/index.html)
+  (external preview tool).
+
+* Download Request Producer (Bulk Data Service/Data Getter)
+
+* Download Request Producer (Data Downloader)
+
+* Download Attempt Result Producer (Data Downloader)
+
+* Download Attempt Result Consumer (Bulk Data Service/Data Getter, Dashboard)
 
 
 ## Sample Python apps
