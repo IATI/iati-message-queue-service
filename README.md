@@ -35,23 +35,25 @@ Downloader. For each service interface there is an
 [AsyncAPI](https://www.asyncapi.com/en) specification written in YAML.
 
 
-* Registry Changes Producer (SuiteCRM): [YAML](./specification/iati-mq-suitecrm.yaml),
+* IATI Registry Messaging Spec: [YAML](./specification/iati-registry.yaml),
   [Rendered
-  HTML](https://htmlpreview.github.io/?https://github.com/IATI/iati-message-queue-service/blob/develop/docs/specification-mq-suitecrm/index.html)
+  HTML](https://htmlpreview.github.io/?https://github.com/IATI/iati-message-queue-service/blob/develop/docs/spec-iati-registry/index.html)
   (external preview tool).
 
-* Registry Changes Consumer (Dashboard and Bulk Data Service/Data Getter):
-  [YAML](./specification/iati-mq-clients.yaml), [Rendered
-  HTML](https://htmlpreview.github.io/?https://github.com/IATI/iati-message-queue-service/blob/develop/docs/specification-mq-clients/index.html)
+* IATI Dashboard Messaging Spec:
+  [YAML](./specification/iati-dashboard.yaml), [Rendered
+  HTML](https://htmlpreview.github.io/?https://github.com/IATI/iati-message-queue-service/blob/develop/docs/spec-iati-dashboard/index.html)
   (external preview tool).
 
-* Download Request Producer (Bulk Data Service/Data Getter)
+* IATI Bulk Data Service Messaging Spec:
+  [YAML](./specification/iati-bulk-data-service.yaml), [Rendered
+  HTML](https://htmlpreview.github.io/?https://github.com/IATI/iati-message-queue-service/blob/develop/docs/spec-iati-bulk-data-service/index.html)
+  (external preview tool).
 
-* Download Request Producer (Data Downloader)
-
-* Download Attempt Result Producer (Data Downloader)
-
-* Download Attempt Result Consumer (Bulk Data Service/Data Getter, Dashboard)
+* IATI Data Downloader Messaging Spec:
+  [YAML](./specification/iati-data-downloader.yaml), [Rendered
+  HTML](https://htmlpreview.github.io/?https://github.com/IATI/iati-message-queue-service/blob/develop/docs/spec-iati-data-downloader/index.html)
+  (external preview tool).
 
 
 ## Sample Python apps
