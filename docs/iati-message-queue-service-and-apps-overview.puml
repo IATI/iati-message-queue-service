@@ -1,4 +1,4 @@
-@startuml IATI Message Queue Service and Connected Apps
+@startuml iati-message-queue-service-and-apps-overview
 scale 2000*1600
 
 skinparam noteFontSize 10
@@ -13,7 +13,7 @@ skinparam noteFontSize 10
 
 AzureServiceBus(IATIMessageQueueService, "\nIATI Message Queue Service", "iati-mq-INSTANCE")
 
-AzureContainerInstance(BulkDataServiceApp, "\nBulk Data Service App\n(Data Getter)", "bulk-data-service-INSTANCE")
+AzureContainerInstance(BulkDataServiceApp, "\nBulk Data Service App", "bulk-data-service-INSTANCE")
 
 AzureFunction(DataDownloader, "\nData Downloader", "")
 
@@ -25,6 +25,10 @@ component SuiteCRM
 
 component Dashboard
 
+note left of BulkDataServiceApp
+App which coordinates the checking of dataset downloads
+end note
+
 note right of SuiteCRM
 Connections from an app to the Message Queue Service are denoted by edges that begin either with **publish:** or **consume:**. The edge description lists the action type and the <<""topic"">> or <<""subscription"">> name (without the instance postfix).
 end note
@@ -34,21 +38,21 @@ SuiteCRM -down-> IATIMessageQueueService : **publish**:\n<<""iati-mq-registry-ch
 
 Dashboard --( IATIMessageQueueService : **consume**:\n<<""iati-mq-registry-changes-sub-dashboard"">>\nDATASET_CREATED,\nDATASET_UPDATED,\nDATASET_DELETED,\n\nREPORTING_ORG_CREATED,\nREPORTING_ORG_UPDATED,\nREPORTING_ORG_DELETED
 
-Dashboard --( IATIMessageQueueService : **consume**:\n<<""iati-mq-dataset-check-result-sub-dashboard"">>\nDATASET_CHECK_RESULT
+Dashboard --( IATIMessageQueueService : **consume**:\n<<""iati-mq-dataset-download-check-notifications-sub-dashboard"">>\nDATASET_DOWNLOAD_CHECK_RESULT
 
-BulkDataServiceApp --> IATIMessageQueueService : **publish**:\n<<""iati-mq-downloader-queue"">>\n<<""iati-mq-downloader-high-priority-queue"">>\nDOWNLOAD_REQUIRED
+BulkDataServiceApp --> IATIMessageQueueService : **publish**:\n<<""iati-mq-download-request-queue"">>\n<<""iati-mq-download-request-high-priority-queue"">>\nDATASET_DOWNLOAD_REQUEST
 
-BulkDataServiceApp --> IATIMessageQueueService : **publish**:\n<<""iati-mq-dataset-check-result-topic"">>\nDATASET_CHECK_RESULT
+BulkDataServiceApp --> IATIMessageQueueService : **publish**:\n<<""iati-mq-dataset-download-check-notifications-topic"">>\nDATASET_DOWNLOAD_CHECK_RESULT
 
-BulkDataServiceApp -up--( IATIMessageQueueService : **consume**:\n<<""iati-mq-registry-changes-sub-data-getter"">>\nDATASET_CREATED,\nDATASET_UPDATED,\nDATASET_DELETED,\n\nREPORTING_ORG_CREATED,\nREPORTING_ORG_UPDATED,\nREPORTING_ORG_DELETED
+BulkDataServiceApp -up--( IATIMessageQueueService : **consume**:\n<<""iati-mq-registry-changes-sub-bds"">>\nDATASET_CREATED,\nDATASET_UPDATED,\nDATASET_DELETED,\n\nREPORTING_ORG_CREATED,\nREPORTING_ORG_UPDATED,\nREPORTING_ORG_DELETED
 
-BulkDataServiceApp --( IATIMessageQueueService : **consume**:\n<<""iati-mq-download-results-sub-data-getter"">>\nDOWNLOAD_ATTEMPT_RESULT
+BulkDataServiceApp --( IATIMessageQueueService : **consume**:\n<<""iati-mq-download-results-sub-bds"">>\nDOWNLOAD_ATTEMPT_RESULT
 
 BulkDataServiceApp --> BulkDataServiceWebsite : upload bulk ZIP
 
 BulkDataServiceApp <--> BDSPersistentStorage : save state
 
-DataDownloader --( IATIMessageQueueService : **consume**:\n<<""iati-mq-downloader-queue"">>\n<<""iati-mq-downloader-high-priority-queue"">>\nDOWNLOAD_REQUIRED
+DataDownloader --( IATIMessageQueueService : **consume**:\n<<""iati-mq-download-request-queue"">>\n<<""iati-mq-download-request-high-priority-queue"">>\nDATASET_DOWNLOAD_REQUEST
 
 DataDownloader -> IATIMessageQueueService : **publish**:\n<<""iati-mq-download-results-topic"">>\nDOWNLOAD_ATTEMPT_RESULT
 
