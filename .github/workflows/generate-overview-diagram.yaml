@@ -1,0 +1,26 @@
+---
+name: Autogenerate documentation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [develop]
+    paths: [docs/*.puml]
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Generate the overview diagram using PlantUML
+        run: ./generate-overview-diagram.sh
+
+      - name: Commit and push documentation changes
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git add docs
+          git commit -m 'docs: overview diagram auto-generated after update'
+          git push
