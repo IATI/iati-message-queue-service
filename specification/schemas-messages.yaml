@@ -1,0 +1,760 @@
+---
+asyncapi: 3.0.0
+info:
+  title: IATI Internal Message Queue Service Common Components - Messages
+  version: 0.0.6
+  description: |
+    Definition of messages needed by apps using the IATI internal message queue
+    service.
+
+defaultContentType: application/json
+
+components:
+  messages:
+    dataset_created:
+      name: dataset_created
+      title: Notification that a dataset has been created.
+      summary: |
+        Message indicating that a dataset record has been deleted on the
+        Registry. The `message_id` in this spec serves to identify the
+        message type is not itself part of the message, but this message must
+        contain an application header called `message_type` that contains the
+        `DATASET_CREATED` in uppercase.
+      headers:
+        type: object
+        properties:
+          message_type:
+            type: string
+            const: "DATASET_CREATED"
+            description: |
+              This is set as a key/value pair as the custom application headers
+              (in the Azure library it's the `application_properties`
+              parameter).
+      payload:
+        type: object
+        required:
+          - message_type
+          - message_date
+          - dataset
+          - dataset_action
+        properties:
+          message_type:
+            type: string
+            const: "DATASET_CREATED"
+          message_date:
+            type: string
+            format: date-time
+            example: 2025-06-27T06:54:20+00:00
+          dataset:
+            $ref: "#/components/schemas/dataset"
+          dataset_action:
+            $ref: "#/components/schemas/dataset_action"
+
+    dataset_updated:
+      name: dataset_updated
+      title: Notification that a dataset has been updated.
+      summary: |
+        Message indicating that a dataset record has been deleted on the
+        Registry. The `message_id` in this spec serves to identify the
+        message type is not itself part of the message, but this message must
+        contain an application header called `message_type` that contains the
+        `DATASET_UPDATED` in uppercase.
+      headers:
+        type: object
+        properties:
+          message_type:
+            type: string
+            const: "DATASET_UPDATED"
+            description: |
+              This is set as a key/value pair as the custom application headers
+              (in the Azure library it's the `application_properties`
+              parameter).
+      payload:
+        type: object
+        required:
+          - message_type
+          - message_date
+          - dataset
+          - dataset_action
+        properties:
+          message_type:
+            type: string
+            const: "DATASET_UPDATED"
+          message_date:
+            type: string
+            format: date-time
+            example: 2025-06-27T06:54:20+00:00
+          dataset:
+            $ref: "#/components/schemas/dataset"
+          dataset_action:
+            $ref: "#/components/schemas/dataset_action"
+
+    dataset_deleted:
+      name: dataset_deleted
+      title: Notification that a dataset has been deleted.
+      summary: |
+        Message indicating that a dataset record has been deleted on the
+        Registry. The `message_id` in this spec serves to identify the
+        message type is not itself part of the message, but this message must
+        contain an application header called `message_type` that contains the
+        `DATASET_DELETED` in uppercase.
+      headers:
+        type: object
+        properties:
+          message_type:
+            type: string
+            const: "DATASET_DELETED"
+            description: |
+              This is set as a key/value pair as the custom application headers
+              (in the Azure library it's the `application_properties`
+              parameter).
+      payload:
+        type: object
+        required:
+          - message_type
+          - message_date
+          - dataset
+          - dataset_action
+        properties:
+          message_type:
+            type: string
+            const: "DATASET_DELETED"
+          message_date:
+            type: string
+            format: date-time
+            example: 2025-06-27T06:54:20+00:00
+          dataset:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: string
+                format: uuid
+                example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
+          dataset_action:
+            $ref: "#/components/schemas/dataset_action"
+
+    reporting_org_created:
+      name: reporting_org_created
+      title: Notification that a reporting org has been created.
+      summary: |
+        Message indicating that a dataset record has been deleted on the
+        Registry. The `message_id` in this spec serves to identify the
+        message type is not itself part of the message, but this message must
+        contain an application header called `message_type` that contains the
+        `REPORTING_ORG_CREATED` in uppercase.
+      headers:
+        type: object
+        properties:
+          message_type:
+            type: string
+            const: "REPORTING_ORG_CREATED"
+            description: |
+              This is set as a key/value pair as the custom application headers
+              (in the Azure library it's the `application_properties`
+              parameter).
+      payload:
+        type: object
+        required:
+          - message_type
+          - message_date
+          - reporting_org
+          - reporting_org_action
+        properties:
+          message_type:
+            type: string
+            const: "REPORTING_ORG_CREATED"
+          message_date:
+            type: string
+            format: date-time
+            example: 2025-06-27T06:54:20+00:00
+          reporting_org:
+            $ref: "#/components/schemas/reporting_org"
+          reporting_org_action:
+            $ref: "#/components/schemas/reporting_org_action"
+
+    reporting_org_updated:
+      name: reporting_org_updated
+      title: Notification that a reporting org has been updated.
+      summary: |
+        Message indicating that a reporting_org record has been updated on the
+        Registry. The `message_id` in this spec serves to identify the
+        message type is not itself part of the message, but this message must
+        contain an application header called `message_type` that contains the
+        `REPORTING_ORG_UPDATED` in uppercase.
+      headers:
+        type: object
+        properties:
+          message_type:
+            type: string
+            const: "REPORTING_ORG_UPDATED"
+            description: |
+              This is set as a key/value pair as the custom application headers
+              (in the Azure library it's the `application_properties`
+              parameter).
+      payload:
+        type: object
+        required:
+          - message_type
+          - message_date
+          - reporting_org
+          - reporting_org_action
+        properties:
+          message_type:
+            type: string
+            const: "REPORTING_ORG_UPDATED"
+          message_date:
+            type: string
+            format: date-time
+            example: 2025-06-27T06:54:20+00:00
+          reporting_org:
+            $ref: "#/components/schemas/reporting_org"
+          reporting_org_action:
+            $ref: "#/components/schemas/reporting_org_action"
+
+    reporting_org_deleted:
+      name: reporting_org_deleted
+      title: Notification that a reporting org has been deleted.
+      summary: |
+        Message indicating that a reporting_org record has been deleted on the
+        Registry. The `message_id` in this spec serves to identify the
+        message type is not itself part of the message, but this message must
+        contain an application header called `message_type` that contains the
+        `REPORTING_ORG_DELETED` in uppercase.
+      headers:
+        type: object
+        properties:
+          message_type:
+            type: string
+            const: "REPORTING_ORG_DELETED"
+            description: |
+              This is set as a key/value pair as the custom application headers
+              (in the Azure library it's the `application_properties`
+              parameter).
+      payload:
+        type: object
+        required:
+          - message_type
+          - message_date
+          - reporting_org
+          - reporting_org_action
+        properties:
+          message_type:
+            type: string
+            const: "REPORTING_ORG_DELETED"
+          message_date:
+            type: string
+            format: date-time
+            example: 2025-06-27T06:54:20+00:00
+          reporting_org:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: string
+                format: uuid
+                example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
+          reporting_org_action:
+            $ref: "#/components/schemas/reporting_org_action"
+
+    dataset_download_check_result:
+      name: dataset_download_check_result
+      title: The result of a dataset download check.
+      summary: |
+        Message describing the result of a Bulk Data Service dataset check. The
+        `message_id` in this spec serves to identify the message type is not
+        itself part of the message, but this message must contain an application
+        header called `message_type` that contains the
+        `DATASET_DOWNLOAD_CHECK_RESULT` in uppercase.
+      headers:
+        type: object
+        properties:
+          message_type:
+            type: string
+            const: "DATASET_DOWNLOAD_CHECK_RESULT"
+            description: |
+              This is set as a key/value pair as the custom application headers
+              (in the Azure library it's the `application_properties`
+              parameter).
+      payload:
+        type: object
+        required:
+          - message_type
+          - message_date
+          - dataset_download_check_result
+        properties:
+          message_type:
+            type: string
+            const: "DATASET_DOWNLOAD_CHECK_RESULT"
+          message_date:
+            type: string
+            format: date-time
+            example: 2025-06-27T06:54:20+00:00
+          dataset_download_check_result:
+            $ref: "#/components/schemas/dataset_download_check_result"
+
+    dataset_download_attempt_result:
+      name: dataset_download_attempt_result
+      title: The result of a full dataset download check.
+      summary: |
+        Message describing the result of a Data Downloader dataset download
+        attempt. The `message_id` in this spec serves to identify the message
+        type is not itself part of the message, but this message must contain an
+        application header called `message_type` that contains the `_RESULT` in
+        uppercase.
+      headers:
+        type: object
+        properties:
+          message_type:
+            type: string
+            const: "DATASET_DOWNLOAD_ATTEMPT_RESULT"
+            description: |
+              This is set as a key/value pair as the custom application headers
+              (in the Azure library it's the `application_properties`
+              parameter).
+      payload:
+        type: object
+        required:
+          - message_type
+          - message_date
+          - dataset_download_attempt_result
+        properties:
+          message_type:
+            type: string
+            const: "DATASET_DOWNLOAD_ATTEMPT_RESULT"
+          message_date:
+            type: string
+            format: date-time
+            example: 2025-06-27T06:54:20+00:00
+          dataset_download_check_result:
+            $ref: "#/components/schemas/dataset_download_attempt_result"
+
+    dataset_download_request:
+      name: dataset_download_request
+      title: |
+        Request for a full download attempt to be made on the specified dataset.
+      summary: |
+        Message requesting that a full download attempt be made for the
+        specified dataset. The `message_id` in this spec serves to identify the
+        message type is not itself part of the message, but this message must
+        contain an application header called `message_type` that contains the
+        `DATASET_DOWNLOAD_REQUEST` in uppercase.
+      headers:
+        type: object
+        properties:
+          message_type:
+            type: string
+            const: "DATASET_DOWNLOAD_REQUEST"
+            description: |
+              This is set as a key/value pair as the custom application headers
+              (in the Azure library it's the `application_properties`
+              parameter).
+      payload:
+        type: object
+        required:
+          - message_type
+          - message_date
+          - dataset_download_request
+        properties:
+          message_type:
+            type: string
+            const: "DATASET_DOWNLOAD_REQUEST"
+          message_date:
+            type: string
+            format: date-time
+            example: 2025-06-27T06:54:20+00:00
+          dataset:
+            $ref: "#/components/schemas/dataset"
+
+  schemas:
+    dataset:
+      title: An IATI Registry dataset record.
+      type: object
+      required:
+        - id
+        - short_name
+        - source_type
+        - url
+        - last_url_update_date
+        - last_metadata_update_date
+        - licence_id
+        - reporting_org_id
+        - reporting_org_short_name
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
+        short_name:
+          type: string
+          example: aidagcy-activity-3
+        source_type:
+          type: string
+          enum:
+            - primary-source
+            - secondary-source
+          example: primary-source
+        licence_id:
+          type: string
+          example: gpl-3.0
+        url:
+          type: string
+          format: url
+          example: https://www.example.org/datasets/activity3.xml
+        last_url_update_date:
+          type: string
+          format: date-time
+          example: 2025-06-27T06:54:20+00:00
+        last_metadata_update_date:
+          type: string
+          format: date-time
+          example: 2025-06-27T06:54:20+00:00
+        reporting_org_id:
+          type: string
+          format: uuid
+          example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
+        reporting_org_short_name:
+          type: string
+          example: aidagcy
+
+    dataset_action:
+      title: An action taken on an IATI Registry dataset record.
+      type: object
+      required:
+        - id
+        - dataset_id
+        - action_type
+        - action_created
+        - user_application
+        - user_name
+        - user_id
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
+        dataset_id:
+          type: string
+          format: uuid
+          example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
+        action_type:
+          type: string
+          enum:
+            - create
+            - update_url
+            - update_metadata
+            - delete
+          example: update_url
+        action_created:
+          type: string
+          format: date-time
+          example: 2025-06-27T06:54:20+00:00
+        user_application:
+          type: string
+          example: Register Your Data WebApp
+        user_name:
+          type: string
+          format: name
+          example: John Smith
+        user_id:
+          type: string
+          format: uuid
+          example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
+
+    reporting_org:
+      title: An IATI Registry reporting_org record.
+      type: object
+      required:
+        - id
+        - short_name
+        - human_readable_name
+        - hq_country
+        - region
+        - iati_organisation_identifier
+        - iati_organisation_type
+        - data_portal_url
+        - exclusions_policy_url
+        - reporting_source_type
+        - default_licence_id
+        - contact_email
+        - address
+        - phone
+        - first_publication_date
+        - number_of_publisher_datasets
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
+        short_name:
+          type: string
+          example: aidagcy
+        human_readable_name:
+          type: string
+          example: Aid Agency
+        hq_country:
+          type: string
+          example: Colombia
+        region:
+          type: string
+          example: South America, regional
+        iati_organisation_identifier:
+          type: string
+          example: CO-ABC-123456
+        iati_organisation_type:
+          type: string
+          example: Regional NGO
+        data_portal_url:
+          type: string
+          format: url
+          example: https://www.example.org/data-portal
+        exclusions_policy_url:
+          type: string
+          format: url
+          example: https://www.example.org/exclusions-policy
+        reporting_source_type:
+          type: string
+          example: primary-source
+          enum:
+            - primary-source
+            - secondary-source
+        default_licence_id:
+          type: string
+          example: gpl-3.0
+        contact_email:
+          type: string
+          format: email
+          example: org.admin@example.org
+        address:
+          type: string
+          example: Fake Address
+        phone:
+          type: string
+          format: phone
+          example: 123-4567-8901
+        first_publication_date:
+          type: string
+          format: date-time
+          example: 2025-06-27T07:31:06+00:00
+        number_of_published_datasets:
+          type: number
+          format: int
+          example: 12
+
+    reporting_org_action:
+      title: An action taken on an IATI Registry reporting org record.
+      type: object
+      required:
+        - id
+        - reporting_org_id
+        - action_type
+        - action_created
+        - user_application
+        - user_name
+        - user_id
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
+        reporting_org_id:
+          type: string
+          format: uuid
+          example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
+        action_type:
+          type: string
+          enum:
+            - create
+            - update
+            - delete
+          example: update
+        action_created:
+          type: string
+          format: date-time
+          example: 2025-06-27T06:54:20+00:00
+        user_application:
+          type: string
+          example: Register Your Data WebApp
+        user_name:
+          type: string
+          format: name
+          example: John Smith
+        user_id:
+          type: string
+          format: uuid
+          example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
+
+    dataset_download_get_attempt:
+      title: |
+        A message schema which details the results of GET attempt by the Data
+        Downloader.
+      type: object
+      properties:
+        datetime:
+          type: string
+          format: date-time
+          example: 2025-06-27T07:31:06+00:00
+        error_details:
+          type: object
+          properties:
+            http_headers:
+              type: object
+            http_method:
+              type: string
+              const: GET
+            http_reason:
+              type: string
+              example: Not Found
+            http_status_code:
+              type: string
+              format: int
+              example: 404
+            message:
+              type: string
+              example: HTTP GET request failed with non-200 status
+            url:
+              type: string
+              format: url
+              example: https://www.example.com/files/aidagcy/aidagcy-activity-file.xml
+        http_status:
+          type: string
+          format: int
+          example: 405
+
+    dataset_download_check_result:
+      title: |
+        An message which details the results of a Bulk Data Service check
+        operation on the dataset.
+      type: object
+      required:
+        - id
+        - short_name
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 22d82ca0-67de-11f0-90a9-a7bd7f82882f
+        short_name:
+          type: string
+          example: aidagcy-activity-3
+        reporting_org_id:
+          type: string
+          format: uuid
+          example: de576bb9-5f2b-4d43-a570-53ab3b8bb9b8
+        reporting_org_short_name:
+          type: string
+          example: aidagcy
+        licence_id:
+          type: string
+        source_url:
+          type: string
+          format: url
+          example: https://www.example.com/files/aidagcy/aidagcy-activity-file.xml
+        last_update_check:
+          type: string
+          format: date-time
+          example: 2025-06-27T07:31:06+00:00
+
+        last_known_good_dataset:
+          type: object
+          properties:
+            cached_dataset_url_xml:
+              type: string
+              format: url
+              example: https://bulk-data.iatistandard.org/aidagcy/aidagcy-activity-3.xml
+            cached_dataset_url_zip:
+              type: string
+              format: url
+              example: https://bulk-data.iatistandard.org/aidagcy/aidagcy-activity-3.zip
+            content_length:
+              type: string
+              format: int
+              example: 1612475
+            downloaded:
+              type: string
+              format: date-time
+              example: 2025-06-27T07:31:06+00:00
+            hash:
+              type: string
+              example: 041c7dba17b9356be78edc99016d337aa7c33f3a
+            hash_excluding_generated_timestamp:
+              type: string
+              example: 738a1ad14dca2451fa89e642b753101dcf57ce2f
+            initial_contents:
+              type: string
+              example: |
+                <iati-activities version="2.03"
+                generated-datetime="2025-07-23T20:06:02"><iati-activity
+                xml:lang="en" d
+            server_header_etag:
+              type: string
+              example: '"KXDMHBNCLJWWUV"'
+            server_header_last_modified:
+              type: string
+              format: date-time
+              example: 2025-06-27T07:31:06+00:00
+            source_url:
+              type: string
+              format: url
+              example: https://www.example.com/files/aidagcy/aidagcy-activity-file.xml
+            verified_on_server:
+              type: string
+              format: date-time
+              example: 2025-06-27T07:31:06+00:00
+
+        most_recent_head_attempt:
+          type: object
+          properties:
+            datetime:
+              type: string
+              format: date-time
+              example: 2025-06-27T07:31:06+00:00
+            error_details:
+              type: object
+              properties:
+                http_headers:
+                  type: object
+                http_method:
+                  type: string
+                  const: HEAD
+                http_reason:
+                  type: string
+                  example: Method Not Allowed
+                http_status_code:
+                  type: string
+                  format: int
+                  example: 405
+                message:
+                  type: string
+                  example: HEAD request failed with non-200 status
+                url:
+                  type: string
+                  format: url
+                  example: https://www.example.com/files/aidagcy/aidagcy-activity-file.xml
+          http_status:
+            type: string
+            format: int
+            example: 405
+
+        most_recent_get_attempt:
+          $ref: "#/components/schemas/dataset_download_get_attempt"
+
+    dataset_download_attempt_result:
+      title: |
+        An message which details the results of a full dataset download attempt.
+      type: object
+      required:
+        - id
+        - short_name
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 22d82ca0-67de-11f0-90a9-a7bd7f82882f
+        short_name:
+          type: string
+          example: aidagcy-activity-3
+        most_recent_get_attempt:
+          $ref: "#/components/schemas/dataset_download_get_attempt"

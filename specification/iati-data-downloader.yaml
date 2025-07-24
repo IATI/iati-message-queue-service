@@ -1,0 +1,65 @@
+---
+asyncapi: 3.0.0
+info:
+  title: IATI Data Downloader Messaging Spec
+  version: 0.0.6
+  description: Messaging specification for the IATI Data Downloader Functions App
+
+defaultContentType: application/json
+
+servers:
+  iati-mq-test-amqp:
+    $ref: 'schemas-servers.yaml#/servers/iati-mq-test-amqp'
+
+  iati-mq-test-https:
+    $ref: 'schemas-servers.yaml#/servers/iati-mq-test-https'
+
+channels:
+  dataset_download_attempt_results:
+    title: Full dataset download attempt results from the Data Downloader.
+    description: |
+      > A subscription on which the Bulk Data Service receives the results of
+      full download attempts by the Data Downloader.
+
+      The address above (`iati-mq-dataset-download-attempt-result-topic`) is an
+      Azure Service Bus subscription and is where the Bulk Data Service gets the
+      results from full download attempts.
+
+      The general form of the subscription name is
+      `iati-mq-dataset-download-attempt-result-topic-INSTANCE`, where `INSTANCE`
+      is to be replaced with one of `test`, `dev`, and `prod`, as per the
+      typical IATI server setup.
+    address: iati-mq-dataset-download-attempt-result-topic-bds
+    messages:
+      dataset_download_check_result:
+        $ref: './schemas-messages.yaml#/components/messages/dataset_download_attempt_result'
+
+operations:
+
+  dataset_download_attempt_results:
+    title: Dataset full download attempt results.
+    description: |
+      The operation ID `dataset_download_attempt_results` is to uniquely
+      identify operations, when a channel supports more than one. It does not
+      need to appear anywhere in the message sent.
+    action: send
+    channel:
+      $ref: '#/channels/dataset_download_attempt_results'
+
+  dataset_download_request:
+    description: |
+      The operation ID `dataset_download_request` is to uniquely identify
+      operations, when a channel supports more than one. It does not need to
+      appear anywhere in the message sent.
+    action: receive
+    channel:
+      $ref: './schemas-channels.yaml#/channels/dataset_download_request'
+
+  dataset_high_priority_download_request:
+    description: |
+      The operation ID `dataset_high_priority_download_request` is to uniquely
+      identify operations, when a channel supports more than one. It does not
+      need to appear anywhere in the message sent.
+    action: receive
+    channel:
+      $ref: './schemas-channels.yaml#/channels/dataset_high_priority_download_request'

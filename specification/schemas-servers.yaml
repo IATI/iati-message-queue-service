@@ -1,0 +1,42 @@
+---
+asyncapi: 3.0.0
+info:
+  title: IATI Internal Message Queue Service Common Components - Messages
+  version: 0.0.6
+  description: |
+    Definition of messages needed by apps using the IATI internal message queue
+    service.
+
+defaultContentType: application/json
+
+servers:
+  iati-mq-test-amqp:
+    title: IATI Message Queue Service
+    summary: IATI Message Queue Service over AMQPS
+    description: |
+      When connecting using a 3rd party AMQPS client, the topic name goes in
+      username, api key in password.
+
+      When connecting using the Azure Service Bus Python library, connections
+      are made using `Endpoint=sb://` connection strings that are available in
+      the Azure portal and which incorporate Shared Access Keys. Go to: Azure
+      portal > Service Bus Namespace > Topic > Shared access policies.
+    host: iati-mq-test.servicebus.windows.net
+    protocol: amqps
+    security:
+      - type: apiKey
+        in: password
+
+  iati-mq-test-https:
+    title: IATI Message Queue Service
+    summary: IATI Message Queue Service using Azure's REST HTTP API
+    description: |
+      Shared access keys available in Azure portal.
+    externalDocs:
+      url: https://learn.microsoft.com/en-us/rest/api/servicebus/
+      description: Azure Reference Docs
+    host: iati-mq-test.servicebus.windows.net
+    protocol: https
+    security:
+      - type: http
+        scheme: SharedAccessSignatures

@@ -1,0 +1,45 @@
+---
+asyncapi: 3.0.0
+info:
+  title: IATI Internal Message Queue Service Common Components - Channels
+  version: 0.0.6
+  description: |
+    Definition of channels (topics, subscriptions, queues) needed by apps using
+    the IATI internal message queue service.
+
+defaultContentType: application/json
+
+channels:
+  dataset_download_request:
+    title: Queue for standard dataset download requests.
+    description: |
+      > A queue for full download attempt requests sent from the Bulk Data
+      Service to the Data Downloader.
+
+      The address above (`iati-mq-dataset-download-request-queue`) is an Azure
+      Service Bus queue.
+
+      The general form of the queue name is
+      `iati-mq-dataset-download-request-queue-INSTANCE`, where `INSTANCE` is to
+      be replaced with one of `test`, `dev`, and `prod`.
+    address: iati-mq-dataset-download-request-queue
+    messages:
+      dataset_download_request:
+        $ref: './schemas-messages.yaml#/components/messages/dataset_download_request'
+
+  dataset_high_priority_download_request:
+    title: Queue for high priority dataset download requests.
+    description: |
+      > A queue for high priority full download attempt requests sent from the
+      Bulk Data Service to the Data Downloader.
+
+      The address above (`iati-mq-dataset-high-priroity-download-request-queue`)
+      is an Azure Service Bus queue.
+
+      The general form of the queue name is
+      `iati-mq-dataset-high-priroity-download-request-queue-INSTANCE`, where
+      `INSTANCE` is to be replaced with one of `test`, `dev`, and `prod`.
+    address: iati-mq-dataset-high-priroity-download-request-queue
+    messages:
+      dataset_download_request:
+        $ref: './schemas-messages.yaml#/components/messages/dataset_download_request'

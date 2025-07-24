@@ -1,0 +1,142 @@
+---
+asyncapi: 3.0.0
+info:
+  title: IATI Bulk Data Service Messaging Spec
+  version: 0.0.6
+  description: Messaging specification for the IATI Bulk Data Service App
+
+defaultContentType: application/json
+
+servers:
+  iati-mq-test-amqp:
+    $ref: 'schemas-servers.yaml#/servers/iati-mq-test-amqp'
+
+  iati-mq-test-https:
+    $ref: 'schemas-servers.yaml#/servers/iati-mq-test-https'
+
+channels:
+  registry_data_record_changes:
+    title: IATI Registry Record Changes Delivery Subscription
+    description: |
+      > A subscription that receives notifications of changes to IATI Registry
+      data (dataset and reporting_org) records are sent.
+
+      The address above (`iati-mq-registry-changes-sub-bds-test`) is an Azure
+      Service Bus *subscription* where notifications of changes to Registry
+      records will be delivered. Messages received on this subscription come
+      from the Service Bus *topic* `iati-mq-registry-changes-topic-test`.
+
+      The general form of the *subscription* name is
+      `iati-mq-registry-changes-sub-bds-INSTANCE`, where `INSTANCE` is to be
+      replaced with one of `test`, `dev`, and `prod`, as per the typical IATI
+      server setup. (Currently only `test` is active).
+    address: iati-mq-registry-changes-sub-bds-test
+    messages:
+      dataset_created:
+        $ref: './schemas-messages.yaml#/components/messages/dataset_created'
+      dataset_updated:
+        $ref: './schemas-messages.yaml#/components/messages/dataset_updated'
+      dataset_deleted:
+        $ref: './schemas-messages.yaml#/components/messages/dataset_deleted'
+      reporting_org_created:
+        $ref: './schemas-messages.yaml#/components/messages/reporting_org_created'
+      reporting_org_updated:
+        $ref: './schemas-messages.yaml#/components/messages/reporting_org_updated'
+      reporting_org_deleted:
+        $ref: './schemas-messages.yaml#/components/messages/reporting_org_deleted'
+
+  dataset_download_check_results:
+    title: Dataset download check results send by the Bulk Data Service.
+    description: |
+      > A topic to which the Bulk Data Service sends notifications of dataset
+      download check operations, as well as the results of those operations.
+
+      The Bulk Data Service dataset checks always involve issuing a
+      `HEAD` request for the dataset, but only if needed will a `GET` request be
+      made, so these dataset check records may indicate the dataset has been
+      re-downloaded or may indicate that a `HEAD` request has confirmed the
+      dataset is unchanged.
+
+      The `dataset_download_check_result` property of the message payload is the
+      complete Bulk Data Service record for the given dataset (as included in
+      the Bulk Data Service's Full Index).
+
+      The address above (`iati-mq-dataset-download-check-notifications-topic`)
+      is an Azure Service Bus *topic* and is where the Bulk Data Service will
+      send notifications of dataset download checks.
+
+      The general form of the *topic* name is
+      `iati-mq-dataset-download-check-notifications-topic-INSTANCE`, where
+      `INSTANCE` is to be replaced with one of `test`, `dev`, and `prod`, as per
+      the typical IATI server setup.
+    address: iati-mq-dataset-download-check-notifications-topic
+    messages:
+      dataset_download_check_result:
+        $ref: './schemas-messages.yaml#/components/messages/dataset_download_check_result'
+
+  dataset_download_attempt_results:
+    title: Dataset full download attempt results from the Data Downloader.
+    description: |
+      > A subscription on which the Bulk Data Service receives the results of
+      full download attempts by the Data Downloader.
+
+      The address above (`iati-mq-dataset-download-attempt-result-sub-bds`) is
+      an Azure Service Bus subscription and is where the Bulk Data Service gets
+      the results from full download attempts.
+
+      The general form of the subscription name is
+      `iati-mq-dataset-download-attempt-result-sub-bds-INSTANCE`, where
+      `INSTANCE` is to be replaced with one of `test`, `dev`, and `prod`, as per
+      the typical IATI server setup.
+    address: iati-mq-dataset-download-attempt-result-sub-bds
+    messages:
+      dataset_download_check_result:
+        $ref: './schemas-messages.yaml#/components/messages/dataset_download_attempt_result'
+
+operations:
+  registry_changes:
+    title: Data record change notifications from the IATI Registry.
+    description: |
+      The operation ID `registry_changes` is to uniquely identify operations,
+      when a channel supports more than one. It does not need to appear anywhere
+      in the message sent.
+    action: receive
+    channel:
+      $ref: '#/channels/registry_data_record_changes'
+
+  dataset_download_attempt_results:
+    title: Dataset full download attempt results.
+    description: |
+      The operation ID `dataset_download_attempt_results` is to uniquely
+      identify operations, when a channel supports more than one. It does not
+      need to appear anywhere in the message sent.
+    action: receive
+    channel:
+      $ref: '#/channels/dataset_download_attempt_results'
+
+  dataset_check_results:
+    description: |
+      The operation ID `dataset__check_results` is to uniquely identify
+      operations, when a channel supports more than one. It does not need to
+      appear anywhere in the message sent.
+    action: send
+    channel:
+      $ref: '#/channels/dataset_download_check_results'
+
+  dataset_download_request:
+    description: |
+      The operation ID `dataset_download_request` is to uniquely identify
+      operations, when a channel supports more than one. It does not need to
+      appear anywhere in the message sent.
+    action: send
+    channel:
+      $ref: './schemas-channels.yaml#/channels/dataset_download_request'
+
+  dataset_high_priority_download_request:
+    description: |
+      The operation ID `dataset_high_priority_download_request` is to uniquely
+      identify operations, when a channel supports more than one. It does not
+      need to appear anywhere in the message sent.
+    action: send
+    channel:
+      $ref: './schemas-channels.yaml#/channels/dataset_high_priority_download_request'
