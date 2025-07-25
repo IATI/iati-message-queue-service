@@ -79,7 +79,7 @@ def generate_sample_dataset_message(
     dataset_uuid: str | None = None,
     dataset_short_name: str | None = None,
     reporting_org_uuid: str | None = None,
-):
+) -> dict:
     reporting_org = get_sample_reporting_org_short_name()
     dataset_sample_short_name = get_sample_dataset_short_name(reporting_org)
 
@@ -100,46 +100,75 @@ def generate_sample_dataset_message(
     }
 
 
-def generate_example_payload(
-    update_type: str,
-    update_record_type: str,
+def generate_download_request_message(
     dataset_uuid: str,
     dataset_short_name: str,
+    dataset_url: str,
     reporting_org_uuid: str,
     reporting_org_short_name: str,
+    hash: str,
 ) -> dict:
-    if update_type == "deleted":
-        primary_uuid = dataset_uuid if update_record_type == "dataset" else reporting_org_uuid
-        payload = generate_sample_delete_message(update_record_type, primary_uuid)
+    reporting_org = get_sample_reporting_org_short_name()
+    dataset_sample_short_name = get_sample_dataset_short_name(reporting_org)
+    return {
+        "message_type": "DATASET_DOWNLOAD_REQUEST",
+        "message_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "dataset": {
+            "id": dataset_uuid if dataset_uuid is not None else str(uuid.uuid4()),
+            "short_name": dataset_short_name if dataset_short_name is not None else dataset_sample_short_name,
+            "source_type": "primary-source" if randint(0, 10) > 5 else "secondary-source",
+            "licence_id": get_sample_dataset_licence_id(),
+            "url": (
+                dataset_url
+                if dataset_url is not None
+                else "https://www.example.org/{}.xml".format(dataset_sample_short_name)
+            ),
+            "last_url_update_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "last_metadata_update_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "reporting_org_id": reporting_org_uuid if reporting_org_uuid is not None else str(uuid.uuid4()),
+            "reporting_org_short_name": (
+                reporting_org_short_name if reporting_org_short_name is not None else reporting_org
+            ),
+        },
+        "dataset_hash_details": {"hash": hash, "hash_excluding_generated_timestamp": hash},
+    }
+
+
+def generate_example_payload(args: argparse.Namespace) -> dict:
+    if args.update_type == "download_request":
+        payload = generate_download_request_message(
+            args.dataset_uuid,
+            args.dataset_short_name,
+            args.dataset_url,
+            args.reporting_org_uuid,
+            args.reporting_org_short_name,
+            args.dataset_hash,
+        )
+    elif args.update_type == "deleted":
+        primary_uuid = args.dataset_uuid if args.update_record_type == "dataset" else args.reporting_org_uuid
+        payload = generate_sample_delete_message(args.update_record_type, primary_uuid)
     else:
-        if update_record_type == "dataset":
+        if args.update_record_type == "dataset":
             payload = generate_sample_dataset_message(
-                update_type, dataset_uuid, dataset_short_name, reporting_org_uuid
+                args.update_type, args.dataset_uuid, args.dataset_short_name, args.reporting_org_uuid
             )
         else:
-            payload = generate_sample_reporting_org_message(update_type, reporting_org_uuid, reporting_org_short_name)
+            payload = generate_sample_reporting_org_message(
+                args.update_type, args.reporting_org_uuid, args.reporting_org_short_name
+            )
     return payload
 
 
-async def send_single_message(
-    update_type: str,
-    update_record_type: str,
-    dataset_uuid: str,
-    dataset_short_name: str,
-    reporting_org_uuid: str,
-    reporting_org_short_name: str,
-    topic_sender: ServiceBusSender,
-):
-    msg_payload = generate_example_payload(
-        update_type, update_record_type, dataset_uuid, dataset_short_name, reporting_org_uuid, reporting_org_short_name
-    )
+async def send_single_message(sender: ServiceBusSender, args: argparse.Namespace):
+
+    msg_payload = generate_example_payload(args)
     msg_payload_as_str = json.dumps(msg_payload, indent=2)
     message = ServiceBusMessage(
         body=msg_payload_as_str, application_properties={"message_type": msg_payload["message_type"]}
     )
-    await topic_sender.send_messages(message)
+    await sender.send_messages(message)
     output = {
-        "info": "Generated and sent a sample {} {} message".format(update_type, update_record_type),
+        "info": "Generated and sent a sample {} message".format(args.update_type),
         "message_payload": msg_payload,
     }
     print(json.dumps(output, indent=2))
@@ -147,33 +176,30 @@ async def send_single_message(
 
 async def main(args: argparse.Namespace):
     conn_str = os.getenv("AZ_SERVICE_BUS_CONNECTION_STRING", "")
-    topic_name = os.getenv("AZ_SERVICE_BUS_TOPIC_NAME", "")
-
     servicebus_client = ServiceBusClient.from_connection_string(conn_str=conn_str, logging_enable=True)
-    topic_sender = servicebus_client.get_topic_sender(topic_name=topic_name)
-    await send_single_message(
-        args.update_type,
-        args.update_record_type,
-        args.dataset_uuid,
-        args.dataset_short_name,
-        args.reporting_org_uuid,
-        args.reporting_org_short_name,
-        topic_sender,
-    )
+
+    if args.update_type == "download_request":
+        queue_name = os.getenv("AZ_SERVICE_BUS_QUEUE_NAME", "")
+        sender = servicebus_client.get_queue_sender(queue_name=queue_name)
+    else:
+        topic_name = os.getenv("AZ_SERVICE_BUS_TOPIC_NAME", "")
+        sender = servicebus_client.get_topic_sender(topic_name=topic_name)
+
+    await send_single_message(sender, args)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="IATI Message Queue Sample App")
+    parser = argparse.ArgumentParser(description="IATI MQ Sample App - Producer")
     parser.add_argument(
         "--update-type",
-        choices=["created", "updated", "deleted"],
+        choices=["created", "updated", "deleted", "download_request"],
         required=True,
-        help="Which type of update message to send",
+        help="Which type of message to send",
     )
     parser.add_argument(
         "--update-record-type",
         choices=["dataset", "reporting_org"],
-        required=True,
+        required=False,
         help="Which type of data record to create a message for",
     )
     parser.add_argument(
@@ -187,6 +213,18 @@ if __name__ == "__main__":
         type=str,
         required=False,
         help="Use the specified short-name for the dataset",
+    )
+    parser.add_argument(
+        "--dataset-url",
+        type=str,
+        required=False,
+        help="Use the specified dataset url",
+    )
+    parser.add_argument(
+        "--dataset-hash",
+        type=str,
+        required=False,
+        help="Dataset hash. Needed to construct valid download request messages.",
     )
     parser.add_argument(
         "--reporting-org-uuid",
