@@ -45,7 +45,7 @@ channels:
       reporting_org_deleted:
         $ref: './schemas-messages.yaml#/components/messages/reporting_org_deleted'
 
-  dataset_download_check_results:
+  dataset_check_results:
     title: Dataset download check results from the Bulk Data Service.
     description: |
       > A subscription that receives notifications of Bulk Data Service dataset
@@ -57,25 +57,24 @@ channels:
       re-downloaded or may indicate that a `HEAD` request has confirmed the
       dataset is unchanged.
 
-      The `dataset_download_check_result` property of the message payload is the
+      The `dataset_check_result` property of the message payload is the
       complete Bulk Data Service record for the given dataset (as included in
       the Bulk Data Service's Full Index).
 
-      The address above
-      (`iati-mq-dataset-download-check-notifications-sub-dashboard`) is an Azure
-      Service Bus *subscription* where notifications of download checks from the
-      Bulk Data Service will be received. Messages received on this subscription
-      come from the Service Bus *topic*
-      `iati-mq-dataset-download-check-notifications-topic`.
+      The address above (`iati-mq-dataset-check-results-sub-dashboard`) is an
+      Azure Service Bus *subscription* where notifications of download checks
+      from the Bulk Data Service will be received. Messages received on this
+      subscription come from the Service Bus *topic*
+      `iati-mq-dataset-check-results-topic`.
 
       The general form of the *subscription* name is
-      `iati-mq-dataset-download-check-notifications-sub-dashboard-INSTANCE`,
-      where `INSTANCE` is to be replaced with one of `test`, `dev`, and `prod`,
-      as per the typical IATI server setup. (Currently only `test` is active).
-    address: iati-mq-dataset-download-check-notifications-sub-dashboard
+      `iati-mq-dataset-check-results-sub-dashboard-INSTANCE`, where `INSTANCE`
+      is to be replaced with one of `test`, `dev`, and `prod`, as per the
+      typical IATI server setup.
+    address: iati-mq-dataset-check-results-sub-dashboard
     messages:
-      dataset_download_check_result:
-        $ref: './schemas-messages.yaml#/components/messages/dataset_download_check_result'
+      dataset_check_result:
+        $ref: './schemas-messages.yaml#/components/messages/dataset_check_result'
 
 operations:
   registry_changes:
@@ -96,4 +95,4 @@ operations:
       appear anywhere in the message sent.
     action: receive
     channel:
-      $ref: '#/channels/dataset_download_check_results'
+      $ref: '#/channels/dataset_check_results'

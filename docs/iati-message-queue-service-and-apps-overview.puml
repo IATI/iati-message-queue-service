@@ -38,23 +38,23 @@ SuiteCRM -down-> IATIMessageQueueService : **publish**:\n<<""iati-mq-registry-ch
 
 Dashboard --( IATIMessageQueueService : **consume**:\n<<""iati-mq-registry-changes-sub-dashboard"">>\nDATASET_CREATED,\nDATASET_UPDATED,\nDATASET_DELETED,\n\nREPORTING_ORG_CREATED,\nREPORTING_ORG_UPDATED,\nREPORTING_ORG_DELETED
 
-Dashboard --( IATIMessageQueueService : **consume**:\n<<""iati-mq-dataset-download-check-notifications-sub-dashboard"">>\nDATASET_DOWNLOAD_CHECK_RESULT
+Dashboard --( IATIMessageQueueService : **consume**:\n<<""iati-mq-dataset-check-results-sub-dashboard"">>\nDATASET_CHECK_RESULT
 
-BulkDataServiceApp --> IATIMessageQueueService : **publish**:\n<<""iati-mq-download-request-queue"">>\n<<""iati-mq-download-request-high-priority-queue"">>\nDATASET_DOWNLOAD_REQUEST
+BulkDataServiceApp --> IATIMessageQueueService : **publish**:\n<<""iati-mq-dataset-download-request-queue"">>\n<<""iati-mq-dataset-high-priority-download-request-queue"">>\nDATASET_DOWNLOAD_REQUEST
 
-BulkDataServiceApp --> IATIMessageQueueService : **publish**:\n<<""iati-mq-dataset-download-check-notifications-topic"">>\nDATASET_DOWNLOAD_CHECK_RESULT
+BulkDataServiceApp --> IATIMessageQueueService : **publish**:\n<<""iati-mq-dataset-check-results-topic"">>\nDATASET_CHECK_RESULT
 
 BulkDataServiceApp -up--( IATIMessageQueueService : **consume**:\n<<""iati-mq-registry-changes-sub-bds"">>\nDATASET_CREATED,\nDATASET_UPDATED,\nDATASET_DELETED,\n\nREPORTING_ORG_CREATED,\nREPORTING_ORG_UPDATED,\nREPORTING_ORG_DELETED
 
-BulkDataServiceApp --( IATIMessageQueueService : **consume**:\n<<""iati-mq-download-results-sub-bds"">>\nDOWNLOAD_ATTEMPT_RESULT
+BulkDataServiceApp --( IATIMessageQueueService : **consume**:\n<<""iati-mq-dataset-download-results-sub-bds"">>\nDATASET_DOWNLOAD_ATTEMPT_RESULT
 
 BulkDataServiceApp --> BulkDataServiceWebsite : upload bulk ZIP
 
 BulkDataServiceApp <--> BDSPersistentStorage : save state
 
-DataDownloader --( IATIMessageQueueService : **consume**:\n<<""iati-mq-download-request-queue"">>\n<<""iati-mq-download-request-high-priority-queue"">>\nDATASET_DOWNLOAD_REQUEST
+DataDownloader --( IATIMessageQueueService : **consume**:\n<<""iati-mq-dataset-download-request-queue"">>\n<<""iati-mq-dataset-high-priority-download-request-queue"">>\nDATASET_DOWNLOAD_REQUEST
 
-DataDownloader -> IATIMessageQueueService : **publish**:\n<<""iati-mq-download-results-topic"">>\nDOWNLOAD_ATTEMPT_RESULT
+DataDownloader -> IATIMessageQueueService : **publish**:\n<<""iati-mq-dataset-download-results-topic"">>\nDATASET_DOWNLOAD_ATTEMPT_RESULT
 
 DataDownloader --> BulkDataServiceWebsite : upload individual\nIATI datasets\n(XML and ZIP)
 

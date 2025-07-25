@@ -31,7 +31,7 @@ channels:
       typical IATI server setup.
     address: iati-mq-dataset-download-attempt-result-topic-bds
     messages:
-      dataset_download_check_result:
+      dataset_download_attempt_result:
         $ref: './schemas-messages.yaml#/components/messages/dataset_download_attempt_result'
 
 operations:

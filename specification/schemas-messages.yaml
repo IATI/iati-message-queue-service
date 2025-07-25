@@ -259,21 +259,21 @@ components:
           reporting_org_action:
             $ref: "#/components/schemas/reporting_org_action"
 
-    dataset_download_check_result:
-      name: dataset_download_check_result
+    dataset_check_result:
+      name: dataset_check_result
       title: The result of a dataset download check.
       summary: |
         Message describing the result of a Bulk Data Service dataset check. The
         `message_id` in this spec serves to identify the message type is not
         itself part of the message, but this message must contain an application
-        header called `message_type` that contains the
-        `DATASET_DOWNLOAD_CHECK_RESULT` in uppercase.
+        header called `message_type` that contains the `DATASET_CHECK_RESULT` in
+        uppercase.
       headers:
         type: object
         properties:
           message_type:
             type: string
-            const: "DATASET_DOWNLOAD_CHECK_RESULT"
+            const: "DATASET_CHECK_RESULT"
             description: |
               This is set as a key/value pair as the custom application headers
               (in the Azure library it's the `application_properties`
@@ -283,17 +283,17 @@ components:
         required:
           - message_type
           - message_date
-          - dataset_download_check_result
+          - dataset_check_result
         properties:
           message_type:
             type: string
-            const: "DATASET_DOWNLOAD_CHECK_RESULT"
+            const: "DATASET_CHECK_RESULT"
           message_date:
             type: string
             format: date-time
             example: 2025-06-27T06:54:20+00:00
-          dataset_download_check_result:
-            $ref: "#/components/schemas/dataset_download_check_result"
+          dataset_check_result:
+            $ref: "#/components/schemas/dataset_check_result"
 
     dataset_download_attempt_result:
       name: dataset_download_attempt_result
@@ -328,7 +328,7 @@ components:
             type: string
             format: date-time
             example: 2025-06-27T06:54:20+00:00
-          dataset_download_check_result:
+          dataset_download_attempt_result:
             $ref: "#/components/schemas/dataset_download_attempt_result"
 
     dataset_download_request:
@@ -623,7 +623,7 @@ components:
           format: int
           example: 405
 
-    dataset_download_check_result:
+    dataset_check_result:
       title: |
         An message which details the results of a Bulk Data Service check
         operation on the dataset.

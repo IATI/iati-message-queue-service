@@ -45,8 +45,8 @@ channels:
       reporting_org_deleted:
         $ref: './schemas-messages.yaml#/components/messages/reporting_org_deleted'
 
-  dataset_download_check_results:
-    title: Dataset download check results send by the Bulk Data Service.
+  dataset_check_results:
+    title: Dataset check results send by the Bulk Data Service.
     description: |
       > A topic to which the Bulk Data Service sends notifications of dataset
       download check operations, as well as the results of those operations.
@@ -57,22 +57,22 @@ channels:
       re-downloaded or may indicate that a `HEAD` request has confirmed the
       dataset is unchanged.
 
-      The `dataset_download_check_result` property of the message payload is the
+      The `dataset_check_result` property of the message payload is the
       complete Bulk Data Service record for the given dataset (as included in
       the Bulk Data Service's Full Index).
 
-      The address above (`iati-mq-dataset-download-check-notifications-topic`)
-      is an Azure Service Bus *topic* and is where the Bulk Data Service will
-      send notifications of dataset download checks.
+      The address above (`iati-mq-dataset-check-results-topic`) is an
+      Azure Service Bus *topic* and is where the Bulk Data Service will send
+      notifications of dataset download checks.
 
       The general form of the *topic* name is
-      `iati-mq-dataset-download-check-notifications-topic-INSTANCE`, where
-      `INSTANCE` is to be replaced with one of `test`, `dev`, and `prod`, as per
-      the typical IATI server setup.
-    address: iati-mq-dataset-download-check-notifications-topic
+      `iati-mq-dataset-check-results-topic-INSTANCE`, where `INSTANCE` is
+      to be replaced with one of `test`, `dev`, and `prod`, as per the typical
+      IATI server setup.
+    address: iati-mq-dataset-check-results-topic
     messages:
-      dataset_download_check_result:
-        $ref: './schemas-messages.yaml#/components/messages/dataset_download_check_result'
+      dataset_check_result:
+        $ref: './schemas-messages.yaml#/components/messages/dataset_check_result'
 
   dataset_download_attempt_results:
     title: Dataset full download attempt results from the Data Downloader.
@@ -90,7 +90,7 @@ channels:
       the typical IATI server setup.
     address: iati-mq-dataset-download-attempt-result-sub-bds
     messages:
-      dataset_download_check_result:
+      dataset_download_attempt_result:
         $ref: './schemas-messages.yaml#/components/messages/dataset_download_attempt_result'
 
 operations:
@@ -121,7 +121,7 @@ operations:
       appear anywhere in the message sent.
     action: send
     channel:
-      $ref: '#/channels/dataset_download_check_results'
+      $ref: '#/channels/dataset_check_results'
 
   dataset_download_request:
     description: |
