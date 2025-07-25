@@ -2,7 +2,7 @@
 asyncapi: 3.0.0
 info:
   title: IATI Internal Message Queue Service Common Components - Messages
-  version: 0.0.6
+  version: 0.0.7
   description: |
     Definition of messages needed by apps using the IATI internal message queue
     service.
@@ -367,6 +367,8 @@ components:
             example: 2025-06-27T06:54:20+00:00
           dataset:
             $ref: "#/components/schemas/dataset"
+          dataset_hash_details:
+            $ref: "#/components/schemas/dataset_hash_details"
 
   schemas:
     dataset:
@@ -586,7 +588,7 @@ components:
           format: uuid
           example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
 
-    dataset_download_get_attempt:
+    dataset_get_attempt_result:
       title: |
         A message schema which details the results of GET attempt by the Data
         Downloader.
@@ -599,21 +601,37 @@ components:
         error_details:
           type: object
           properties:
-            http_headers:
-              type: object
+            error_type:
+              type: string
+              enum:
+                - not_iati_content
+                - http_non_200
+                - connection_error
+                - connection_time
+            summary:
+              type: string
+              example: Download attempt failed due to connection timeout
+            details:
+              type: string
+              example: |
+                "requests.exceptions.ConnectionError:
+                HTTPConnectionPool(host='www.iatistandard.com', port=80): Max
+                retries exceeded with url: / (Caused by
+                NameResolutionError(\"<urllib3.connection.HTTPConnection object
+                at 0x74b4aecaa9c0>: Failed to resolve 'www.iatistandard.com'
+                ([Errno -2] Name or service not known)\"))"
             http_method:
               type: string
               const: GET
             http_reason:
               type: string
               example: Not Found
-            http_status_code:
+            http_status:
               type: string
               format: int
               example: 404
-            message:
-              type: string
-              example: HTTP GET request failed with non-200 status
+            http_headers:
+              type: object
             url:
               type: string
               format: url
@@ -622,6 +640,65 @@ components:
           type: string
           format: int
           example: 405
+
+    dataset_hash_details:
+      title: Dataset hash
+      type: object
+      properties:
+        hash:
+          type: string
+          example: 041c7dba17b9356be78edc99016d337aa7c33f3a
+        hash_excluding_generated_timestamp:
+          type: string
+          example: 738a1ad14dca2451fa89e642b753101dcf57ce2f
+
+    dataset_successful_download_details:
+      title: Details of a successful download of a dataset.
+      type: object
+      properties:
+        cached_dataset_url_xml:
+          type: string
+          format: url
+          example: https://bulk-data.iatistandard.org/aidagcy/aidagcy-activity-3.xml
+        cached_dataset_url_zip:
+          type: string
+          format: url
+          example: https://bulk-data.iatistandard.org/aidagcy/aidagcy-activity-3.zip
+        content_length:
+          type: string
+          format: int
+          example: 1612475
+        downloaded:
+          type: string
+          format: date-time
+          example: 2025-06-27T07:31:06+00:00
+        hash:
+          type: string
+          example: 041c7dba17b9356be78edc99016d337aa7c33f3a
+        hash_excluding_generated_timestamp:
+          type: string
+          example: 738a1ad14dca2451fa89e642b753101dcf57ce2f
+        initial_contents:
+          type: string
+          example: |
+            <iati-activities version="2.03"
+            generated-datetime="2025-07-23T20:06:02"><iati-activity
+            xml:lang="en" d
+        server_header_etag:
+          type: string
+          example: '"KXDMHBNCLJWWUV"'
+        server_header_last_modified:
+          type: string
+          format: date-time
+          example: 2025-06-27T07:31:06+00:00
+        source_url:
+          type: string
+          format: url
+          example: https://www.example.com/files/aidagcy/aidagcy-activity-file.xml
+        verified_on_server:
+          type: string
+          format: date-time
+          example: 2025-06-27T07:31:06+00:00
 
     dataset_check_result:
       title: |
@@ -658,51 +735,7 @@ components:
           example: 2025-06-27T07:31:06+00:00
 
         last_known_good_dataset:
-          type: object
-          properties:
-            cached_dataset_url_xml:
-              type: string
-              format: url
-              example: https://bulk-data.iatistandard.org/aidagcy/aidagcy-activity-3.xml
-            cached_dataset_url_zip:
-              type: string
-              format: url
-              example: https://bulk-data.iatistandard.org/aidagcy/aidagcy-activity-3.zip
-            content_length:
-              type: string
-              format: int
-              example: 1612475
-            downloaded:
-              type: string
-              format: date-time
-              example: 2025-06-27T07:31:06+00:00
-            hash:
-              type: string
-              example: 041c7dba17b9356be78edc99016d337aa7c33f3a
-            hash_excluding_generated_timestamp:
-              type: string
-              example: 738a1ad14dca2451fa89e642b753101dcf57ce2f
-            initial_contents:
-              type: string
-              example: |
-                <iati-activities version="2.03"
-                generated-datetime="2025-07-23T20:06:02"><iati-activity
-                xml:lang="en" d
-            server_header_etag:
-              type: string
-              example: '"KXDMHBNCLJWWUV"'
-            server_header_last_modified:
-              type: string
-              format: date-time
-              example: 2025-06-27T07:31:06+00:00
-            source_url:
-              type: string
-              format: url
-              example: https://www.example.com/files/aidagcy/aidagcy-activity-file.xml
-            verified_on_server:
-              type: string
-              format: date-time
-              example: 2025-06-27T07:31:06+00:00
+          $ref: "#/components/schemas/dataset_successful_download_details"
 
         most_recent_head_attempt:
           type: object
@@ -739,7 +772,7 @@ components:
             example: 405
 
         most_recent_get_attempt:
-          $ref: "#/components/schemas/dataset_download_get_attempt"
+          $ref: "#/components/schemas/dataset_get_attempt_result"
 
     dataset_download_attempt_result:
       title: |
@@ -756,5 +789,7 @@ components:
         short_name:
           type: string
           example: aidagcy-activity-3
-        most_recent_get_attempt:
-          $ref: "#/components/schemas/dataset_download_get_attempt"
+        successful_dataset_download_details:
+          $ref: "#/components/schemas/dataset_successful_download_details"
+        get_attempt_result:
+          $ref: "#/components/schemas/dataset_get_attempt_result"
