@@ -1,5 +1,5 @@
 ---
-name: Autogenerate documentation
+name: Auto-generate Overview Diagram
 
 on:
   workflow_dispatch:
