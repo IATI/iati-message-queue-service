@@ -2,7 +2,7 @@
 asyncapi: 3.0.0
 info:
   title: IATI Internal Message Queue Service Common Components - Messages
-  version: 0.0.7
+  version: 0.0.9
   description: |
     Definition of messages needed by apps using the IATI internal message queue
     service.
@@ -588,10 +588,14 @@ components:
           format: uuid
           example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
 
-    dataset_get_attempt_result:
+    dataset_http_request_attempt_result:
       title: |
-        A message schema which details the results of GET attempt by the Data
-        Downloader.
+        A message schema which details the results of a HEAD or GET attempt by
+        the Data Downloader.
+      summary: |
+        The 'http_status' field provides the HTTP status code regardless of
+        outcome. The 'error_details' sub-object provides detailed information on
+        any error that occurred.
       type: object
       properties:
         datetime:
@@ -603,16 +607,43 @@ components:
           properties:
             error_type:
               type: string
+              description: |
+                **Note:** 'not_iati_content' is only relevant to `GET` requests.
               enum:
-                - not_iati_content
-                - http_non_200
                 - connection_error
-                - connection_time
-            summary:
+                - connection_timeout
+                - too_many_redirects
+                - ssl_error
+                - other_error
+                - http_non_200
+                - not_iati_content
+            http_method:
               type: string
+              enum:
+                - HEAD
+                - GET
+            http_reason:
+              type: string
+              example: Not Found
+            http_status:
+              type: string
+              description: |
+                **Note:** A status of 200 indicates a successful download of
+                some file or other, but the download result could still be in an
+                error state if the file downloaded is not a valid IATI XML file.
+                This is why the `error_occurred` field on the parent object
+                should be used for determining error status.
+              format: int
+              example: 404
+            http_headers:
+              type: object
+            summary_message:
+              type: string
+              description: A succinct message from the relevant IATI app.
               example: Download attempt failed due to connection timeout
-            details:
+            system_message:
               type: string
+              description: The error message from the relevant Python library.
               example: |
                 "requests.exceptions.ConnectionError:
                 HTTPConnectionPool(host='www.iatistandard.com', port=80): Max
@@ -620,26 +651,26 @@ components:
                 NameResolutionError(\"<urllib3.connection.HTTPConnection object
                 at 0x74b4aecaa9c0>: Failed to resolve 'www.iatistandard.com'
                 ([Errno -2] Name or service not known)\"))"
-            http_method:
-              type: string
-              const: GET
-            http_reason:
-              type: string
-              example: Not Found
-            http_status:
-              type: string
-              format: int
-              example: 404
-            http_headers:
-              type: object
             url:
               type: string
               format: url
               example: https://www.example.com/files/aidagcy/aidagcy-activity-file.xml
+        error_occurred:
+          type: boolean
+          description: |
+            **Note:** This indicates whether or not the `HEAD` or `GET` request
+            resulted in an error. The mark of a successful `GET` request is the
+            successful **_download of an IATI XML file_**, such that an
+            'http_status' of 200 does not necessarily indicate success. That is
+            why this field should be used to determine success status.
         http_status:
           type: string
+          description: |
+            **Note:** With `GET` requests, success means 'successful download of
+            an IATI XML file', so the `http_status` field should not be used on
+            its own to determine success status. Use `error_occurred` instead.
           format: int
-          example: 405
+          example: 200
 
     dataset_hash_details:
       title: Dataset hash
@@ -652,7 +683,7 @@ components:
           type: string
           example: 738a1ad14dca2451fa89e642b753101dcf57ce2f
 
-    dataset_successful_download_details:
+    dataset_download_details:
       title: Details of a successful download of a dataset.
       type: object
       properties:
@@ -664,6 +695,9 @@ components:
           type: string
           format: url
           example: https://bulk-data.iatistandard.org/aidagcy/aidagcy-activity-3.zip
+        cached_dataset_etag:
+          type: string
+          example: '"HXCCHBNTLJWWBB"'
         content_length:
           type: string
           format: int
@@ -735,44 +769,13 @@ components:
           example: 2025-06-27T07:31:06+00:00
 
         last_known_good_dataset:
-          $ref: "#/components/schemas/dataset_successful_download_details"
+          $ref: "#/components/schemas/dataset_download_details"
 
         most_recent_head_attempt:
-          type: object
-          properties:
-            datetime:
-              type: string
-              format: date-time
-              example: 2025-06-27T07:31:06+00:00
-            error_details:
-              type: object
-              properties:
-                http_headers:
-                  type: object
-                http_method:
-                  type: string
-                  const: HEAD
-                http_reason:
-                  type: string
-                  example: Method Not Allowed
-                http_status_code:
-                  type: string
-                  format: int
-                  example: 405
-                message:
-                  type: string
-                  example: HEAD request failed with non-200 status
-                url:
-                  type: string
-                  format: url
-                  example: https://www.example.com/files/aidagcy/aidagcy-activity-file.xml
-          http_status:
-            type: string
-            format: int
-            example: 405
+          $ref: "#/components/schemas/dataset_http_request_attempt_result"
 
         most_recent_get_attempt:
-          $ref: "#/components/schemas/dataset_get_attempt_result"
+          $ref: "#/components/schemas/dataset_http_request_attempt_result"
 
     dataset_download_attempt_result:
       title: |
@@ -789,7 +792,7 @@ components:
         short_name:
           type: string
           example: aidagcy-activity-3
-        successful_dataset_download_details:
-          $ref: "#/components/schemas/dataset_successful_download_details"
+        dataset_download_details:
+          $ref: "#/components/schemas/dataset_download_details"
         get_attempt_result:
-          $ref: "#/components/schemas/dataset_get_attempt_result"
+          $ref: "#/components/schemas/dataset_http_request_attempt_result"
