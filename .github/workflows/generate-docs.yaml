@@ -1,18 +1,30 @@
 ---
-name: Auto-generate HTML documentation
+name: Auto-generate documentation
 
 on:
   workflow_dispatch:
   push:
     branches: [develop]
-    paths: [specification/**]
+    paths:
+      - docs/*.puml
+      - specification/**
 
 jobs:
-  generate:
+  generate-docs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Generate the overview diagram using PlantUML
+        run: ./generate-overview-diagram.sh
+
+      - name: Commit and push documentation changes if needed
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git add docs
+          git commit -m 'docs: overview diagram auto-generated after update' || true
 
       - name: Generating HTML for the IATI Registry Spec
         uses: asyncapi/cli@v3.2.0
@@ -51,5 +63,8 @@ jobs:
           git config --global user.name "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
           git add docs
-          git commit -m 'docs: HTML auto-generated after spec update'
+          git commit -m 'docs: HTML auto-generated after spec update' || true
+
+      - name: Push changes back to the repo
+        run: |
           git push
