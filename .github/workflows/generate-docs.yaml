@@ -19,7 +19,7 @@ jobs:
       - name: Generate the overview diagram using PlantUML
         run: ./generate-overview-diagram.sh
 
-      - name: Commit and push documentation changes if needed
+      - name: Commit overview diagram changes (commit will do nothing if no changes)
         run: |
           git config --global user.name "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
@@ -58,7 +58,7 @@ jobs:
           filepath: specification/iati-data-downloader.yaml
           output: docs/spec-iati-data-downloader
 
-      - name: Commit and push documentation changes
+      - name: Commit documentation changes (commit will do nothing if no changes)
         run: |
           git config --global user.name "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
