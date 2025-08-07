@@ -695,9 +695,12 @@ components:
           type: string
           format: url
           example: https://bulk-data.iatistandard.org/aidagcy/aidagcy-activity-3.zip
-        cached_dataset_etag:
+        cached_dataset_etag_xml:
           type: string
           example: '"HXCCHBNTLJWWBB"'
+        cached_dataset_etag_zip:
+          type: string
+          example: '"C1362D1244MWNQ"'
         content_length:
           type: string
           format: int
