@@ -2,7 +2,7 @@
 asyncapi: 3.0.0
 info:
   title: IATI Internal Message Queue Service Common Components - Messages
-  version: 0.0.9
+  version: 0.0.10
   description: |
     Definition of messages needed by apps using the IATI internal message queue
     service.

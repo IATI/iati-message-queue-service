@@ -2,7 +2,7 @@
 asyncapi: 3.0.0
 info:
   title: IATI Data Downloader Messaging Spec
-  version: 0.0.9
+  version: 0.0.10
   description: Messaging specification for the IATI Data Downloader Functions App
 
 defaultContentType: application/json

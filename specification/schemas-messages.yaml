@@ -2,7 +2,7 @@
 asyncapi: 3.0.0
 info:
   title: IATI Internal Message Queue Service Common Components - Messages
-  version: 0.0.9
+  version: 0.0.10
   description: |
     Definition of messages needed by apps using the IATI internal message queue
     service.
@@ -293,6 +293,8 @@ components:
             format: date-time
             example: 2025-06-27T06:54:20+00:00
           dataset_check_result:
+            $ref: "#/components/schemas/dataset_check_result"
+          dataset_check_result_previous_result:
             $ref: "#/components/schemas/dataset_check_result"
 
     dataset_download_attempt_result:
@@ -588,14 +590,91 @@ components:
           format: uuid
           example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
 
-    dataset_http_request_attempt_result:
+    dataset_head_request_attempt_result:
       title: |
-        A message schema which details the results of a HEAD or GET attempt by
-        the Data Downloader.
-      summary: |
-        The 'http_status' field provides the HTTP status code regardless of
-        outcome. The 'error_details' sub-object provides detailed information on
-        any error that occurred.
+        A message schema which details the results of a HEAD attempt by the Bulk
+        Data Service.
+      type: object
+      properties:
+        datetime:
+          description: |
+            The time of the `HEAD` request. `HEAD` requests are only made when
+            the `source_url` is unchanged and the dataset has been successfully
+            downloaded in the last ~72 hours. This means that the time of the
+            most recent `HEAD` request may not be the same as the
+            `last_update_check`.
+          type: string
+          format: date-time
+          example: 2025-06-27T07:31:06+00:00
+        error_details:
+          type: object
+          required:
+            - error_type
+          properties:
+            error_type:
+              description: |
+                The type of error that occurred. `other_error` indicates any
+                connection error not listed that resulted in there not being a
+                valid HTTP response.
+              type: string
+              enum:
+                - connection_error
+                - connection_timeout
+                - too_many_redirects
+                - ssl_error
+                - other_error
+                - http_non_200
+            http_method:
+              type: string
+              const: HEAD
+            http_reason:
+              type: string
+              example: Not Found
+            http_status:
+              type: string
+              format: int
+              example: 404
+            http_headers:
+              type: object
+            summary_message:
+              type: string
+              description: A succinct message from the relevant IATI app.
+              example: Download attempt failed due to connection timeout
+            system_message:
+              type: string
+              description: The error message from the relevant Python library.
+              example: |
+                "requests.exceptions.ConnectionError:
+                HTTPConnectionPool(host='www.iatistandard.com', port=80): Max
+                retries exceeded with url: / (Caused by
+                NameResolutionError(\"<urllib3.connection.HTTPConnection object
+                at 0x74b4aecaa9c0>: Failed to resolve 'www.iatistandard.com'
+                ([Errno -2] Name or service not known)\"))"
+            url:
+              type: string
+              format: url
+              example: https://www.example.com/files/aidagcy/aidagcy-activity-file.xml
+        error_occurred:
+          type: boolean
+          description: |
+            Indicates whether or not the `HEAD` resulted in an error. It will be
+            true if either there was a problem completing the HTTP connection,
+            or if the HTTP response was non-200. False implies `http_status` is
+            200.
+        http_status:
+          type: string
+          description: |
+            The 'http_status' field provides the HTTP status code regardless of
+            outcome.
+          format: int
+          example: 200
+
+    dataset_get_request_attempt_result:
+      title: |
+        A message schema which details the results of a GET attempt by the Bulk
+        Data Service or Data Downloader (eventually, the Data Downloader will be
+        responsible for all GET requests, but in the meantime the Bulk Data
+        Service will still be doing the noraml GET checks).
       type: object
       properties:
         datetime:
@@ -608,7 +687,10 @@ components:
             error_type:
               type: string
               description: |
-                **Note:** 'not_iati_content' is only relevant to `GET` requests.
+                Gives details of the error encountered when making the `GET``
+                request. The value `not_iati_content` indicates that a file was
+                succcessfully downloaded (such that `http_status` will be 200)
+                but that it was not an IATI XML file.
               enum:
                 - connection_error
                 - connection_timeout
@@ -619,9 +701,7 @@ components:
                 - not_iati_content
             http_method:
               type: string
-              enum:
-                - HEAD
-                - GET
+              const: GET
             http_reason:
               type: string
               example: Not Found
@@ -631,7 +711,7 @@ components:
                 **Note:** A status of 200 indicates a successful download of
                 some file or other, but the download result could still be in an
                 error state if the file downloaded is not a valid IATI XML file.
-                This is why the `error_occurred` field on the parent object
+                For this reason, the `error_occurred` field on the parent object
                 should be used for determining error status.
               format: int
               example: 404
@@ -658,17 +738,17 @@ components:
         error_occurred:
           type: boolean
           description: |
-            **Note:** This indicates whether or not the `HEAD` or `GET` request
-            resulted in an error. The mark of a successful `GET` request is the
-            successful **_download of an IATI XML file_**, such that an
-            'http_status' of 200 does not necessarily indicate success. That is
-            why this field should be used to determine success status.
+            Indicates whether or not the `GET` request resulted in the
+            _**successful download of an IATI XML file**_. This means that an
+            HTTP status of 200 does not necessarily indicate success. For this
+            reason, this field should be used to determine success status.
         http_status:
           type: string
           description: |
-            **Note:** With `GET` requests, success means 'successful download of
-            an IATI XML file', so the `http_status` field should not be used on
-            its own to determine success status. Use `error_occurred` instead.
+            An `http_status` of 200 does not necessarily mean an IATI
+            dataset has been successfully downloaded, because the file
+            downloaded may not have been an IATI XML file. For this reason, the
+            `error_occurred` field should be used to determine success.
           format: int
           example: 200
 
@@ -687,18 +767,18 @@ components:
       title: Details of a successful download of a dataset.
       type: object
       properties:
-        cached_dataset_url_xml:
+        cached_dataset_xml_url:
           type: string
           format: url
           example: https://bulk-data.iatistandard.org/aidagcy/aidagcy-activity-3.xml
-        cached_dataset_url_zip:
+        cached_dataset_xml_etag:
+          type: string
+          example: '"HXCCHBNTLJWWBB"'
+        cached_dataset_zip_url:
           type: string
           format: url
           example: https://bulk-data.iatistandard.org/aidagcy/aidagcy-activity-3.zip
-        cached_dataset_etag_xml:
-          type: string
-          example: '"HXCCHBNTLJWWBB"'
-        cached_dataset_etag_zip:
+        cached_dataset_zip_etag:
           type: string
           example: '"C1362D1244MWNQ"'
         content_length:
@@ -767,6 +847,10 @@ components:
           format: url
           example: https://www.example.com/files/aidagcy/aidagcy-activity-file.xml
         last_update_check:
+          description: |
+            This field is updated every time the Bulk Data Service checks the
+            dataset, regardless of whether a full download was attempted and
+            regardless of the result.
           type: string
           format: date-time
           example: 2025-06-27T07:31:06+00:00
@@ -775,10 +859,10 @@ components:
           $ref: "#/components/schemas/dataset_download_details"
 
         most_recent_head_attempt:
-          $ref: "#/components/schemas/dataset_http_request_attempt_result"
+          $ref: "#/components/schemas/dataset_head_request_attempt_result"
 
         most_recent_get_attempt:
-          $ref: "#/components/schemas/dataset_http_request_attempt_result"
+          $ref: "#/components/schemas/dataset_get_request_attempt_result"
 
     dataset_download_attempt_result:
       title: |
@@ -798,4 +882,4 @@ components:
         dataset_download_details:
           $ref: "#/components/schemas/dataset_download_details"
         get_attempt_result:
-          $ref: "#/components/schemas/dataset_http_request_attempt_result"
+          $ref: "#/components/schemas/dataset_get_request_attempt_result"
