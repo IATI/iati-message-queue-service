@@ -2,7 +2,7 @@
 asyncapi: 3.0.0
 info:
   title: IATI Internal Message Queue Service Common Components - Messages
-  version: 0.0.10
+  version: 0.0.11
   description: |
     Definition of messages needed by apps using the IATI internal message queue
     service.
@@ -468,85 +468,69 @@ components:
           example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
 
     reporting_org:
-      title: An IATI Registry reporting_org record.
+      title: An IATI Registry reporting_org record (without contact info).
       type: object
       required:
         - id
-        - short_name
         - human_readable_name
-        - hq_country
-        - region
-        - iati_organisation_identifier
+        - iati_identifier
         - iati_organisation_type
-        - data_portal_url
-        - exclusions_policy_url
-        - reporting_source_type
-        - default_licence_id
-        - contact_email
-        - address
-        - phone
-        - first_publication_date
         - number_of_publisher_datasets
+        - short_name
+        - reporting_source_type
       properties:
-        id:
+        data_portal_url:
           type: string
-          format: uuid
-          example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
-        short_name:
+          format: url
+          example: https://www.example.org/data-portal
+        default_licence_id:
           type: string
-          example: aidagcy
-        human_readable_name:
+          example: gpl-3.0
+        description:
           type: string
-          example: Aid Agency
+          example: |
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        exclusions_policy_url:
+          type: string
+          format: url
+          example: https://www.example.org/exclusions-policy
+        first_publication_date:
+          type: string
+          format: date-time
+          example: 2025-06-27T07:31:06+00:00
         hq_country:
           type: string
           example: Colombia
-        region:
+        human_readable_name:
           type: string
-          example: South America, regional
-        iati_organisation_identifier:
+          example: Aid Agency
+        iati_identifier:
           type: string
           example: CO-ABC-123456
         iati_organisation_type:
           type: string
           example: Regional NGO
-        data_portal_url:
+        id:
           type: string
-          format: url
-          example: https://www.example.org/data-portal
-        exclusions_policy_url:
+          format: uuid
+          example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
+        number_of_published_datasets:
+          type: number
+          format: int
+          example: 12
+        region:
           type: string
-          format: url
-          example: https://www.example.org/exclusions-policy
+          example: South America, regional
         reporting_source_type:
           type: string
           example: primary-source
           enum:
             - primary-source
             - secondary-source
-        default_licence_id:
+        short_name:
           type: string
-          example: gpl-3.0
-        contact_email:
-          type: string
-          format: email
-          example: org.admin@example.org
-        address:
-          type: string
-          example: Fake Address
-        phone:
-          type: string
-          format: phone
-          example: 123-4567-8901
-        first_publication_date:
-          type: string
-          format: date-time
-          example: 2025-06-27T07:31:06+00:00
-        number_of_published_datasets:
-          type: number
-          format: int
-          example: 12
-
+          example: aidagcy
     reporting_org_action:
       title: An action taken on an IATI Registry reporting org record.
       type: object
