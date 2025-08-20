@@ -283,7 +283,7 @@ components:
         required:
           - message_type
           - message_date
-          - dataset_check_result
+          - dataset_check_result_current
         properties:
           message_type:
             type: string
@@ -292,7 +292,7 @@ components:
             type: string
             format: date-time
             example: 2025-06-27T06:54:20+00:00
-          dataset_check_result:
+          dataset_check_result_current:
             $ref: "#/components/schemas/dataset_check_result"
           dataset_check_result_previous:
             $ref: "#/components/schemas/dataset_check_result"
