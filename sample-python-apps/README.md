@@ -19,6 +19,12 @@ to send and receive, so you can use the same key for both sample apps.
 
 Copy `.env-example` to `.env` and fill in the details.
 
+The value for the different message types is should be of the form:
+
+`channel_type,channel_name`
+
+where `channel_type` is either `queue` or `topic`.
+
 Using `dotenv` means you can have multiple `.env-N` files set and then switch
 between them with `dotenv -e ENV_FILE` but if you don't want to use `dotenv` you
 can just source the `.env` file into your terminal.
@@ -26,26 +32,26 @@ can just source the `.env` file into your terminal.
 To send a message using a Python client that uses the Azure Service Bus library:
 
 ```bash
-dotenv python src/producer_azsb_library.py --update-record-type dataset --update-type deleted
+dotenv python src/producer_azsb_library.py --message-type dataset_created 
 
-dotenv python src/producer_azsb_library.py --update-record-type reporting_org --update-type updated
+dotenv python src/producer_azsb_library.py --message-type reporting_org_updated 
 ```
 
-`--update-record-type` can be either `dataset` or `reporting_org`
+Run `dotenv python src/producer_azsb_library.py` to see the permitted values for
+`--message-type`
 
-`--update-type` can be `created`, `updated`, or `deleted`.
-
-You can also specify a given UUID to use for the dataset and/or reporting_org
-which is helpful if you want to test against known data:
+You can specify various dataset or reporting_org fields on the command line so
+as to test against known data. Use `--dataset-fields` or
+`--reporting-org-fields` and then pass one or more fields formatted as
+field=value. Example:
 
 ```bash
-dotenv python src/producer_azsb_library.py --update-record-type dataset \
-                                           --update-type updated \
-                                           --dataset-uuid bd87b5e6-1704-4dcc-9979-efd54358bb2b \
-                                           --reporting-org-uuid 7e9835be-6250-11f0-b2e6-37356d2fe5ee
+dotenv python src/producer_azsb_library.py --message-type dataset_updated \
+                                           --dataset-fields id=bd87b5e6-1704-4dcc-9979-efd54358bb2b \
+                                           --reporting-org-fields id=7e9835be-6250-11f0-b2e6-37356d2fe5ee
 ```
 
-You can also specify the dataset short name and reporting org short name.
+Look at the code to see which fields are supported for which message type.
 
 To receive some messages (removing them from the queue):
 

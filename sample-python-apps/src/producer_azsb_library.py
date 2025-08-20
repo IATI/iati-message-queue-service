@@ -1,11 +1,13 @@
 import argparse
 import asyncio
+import copy
 import json
 import os
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import reduce
 from random import randint
+from typing import Any  # noqa: F401
 
 from azure.servicebus import ServiceBusMessage
 from azure.servicebus.aio import ServiceBusClient, ServiceBusSender
@@ -42,135 +44,196 @@ def generate_sample_delete_message(record_type_to_delete: str, uuid_to_use: str 
     }
 
 
-def generate_sample_reporting_org_message(
-    update_type: str, reporting_org_uuid: str | None = None, reporting_org_short_name: str | None = None
-):
-    reporting_org_short_name_calc = (
-        reporting_org_short_name if reporting_org_short_name is not None else get_sample_reporting_org_short_name()
-    )
+def generate_sample_reporting_org_message(update_type: str, reporting_org_fields: dict):
+    reporting_org_short_name_calc = reporting_org_fields.get("short_name", get_sample_reporting_org_short_name())
     reporting_org_name = reporting_org_short_name_calc.replace("-", " ").title()
 
     return {
-        "message_type": f"REPORTING_ORG_{update_type.upper()}",
+        "message_type": f"{update_type.upper()}",
         "message_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
         "reporting_org": {
-            "id": reporting_org_uuid if reporting_org_uuid is not None else str(uuid.uuid4()),
-            "short_name": reporting_org_short_name_calc,
-            "human_readable_name": reporting_org_name,
-            "hq_country": "United Kingdom",
-            "region": "Europe",
-            "iati_organisation_identifier": "GB-AGY-" + str(randint(100, 900)),
-            "iati_organisation_type": "National NGO",
             "data_portal_url": "https://www.example.org/data-portal/",
-            "exclusions_policy_url": "https://www.example.org/exclusions.html",
-            "reporting_source_type": "primary-source" if randint(0, 10) > 5 else "secondary-source",
             "default_licence_id": "cc-by",
-            "contact_email": fake.email(),
-            "address": fake.address().replace("\n", ", "),
-            "phone": fake.phone_number(),
+            "description": fake.text(),
+            "exclusions_policy_url": "https://www.example.org/exclusions.html",
             "first_publication_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "hq_country": "United Kingdom",
+            "human_readable_name": reporting_org_name,
+            "iati_identifier": "GB-AGY-" + str(randint(100, 900)),
+            "iati_organisation_type": "National NGO",
+            "id": reporting_org_fields.get("id", str(uuid.uuid4())),
             "number_of_published_datasets": randint(0, 50),
+            "region": "Europe",
+            "reporting_source_type": "primary-source" if randint(0, 10) > 5 else "secondary-source",
+            "short_name": reporting_org_short_name_calc,
         },
     }
 
 
-def generate_sample_dataset_message(
-    update_type: str,
-    dataset_uuid: str | None = None,
-    dataset_short_name: str | None = None,
-    reporting_org_uuid: str | None = None,
-) -> dict:
+def generate_sample_dataset_message(update_type: str, dataset_fields: dict, reporting_org_fields: dict) -> dict:
     reporting_org = get_sample_reporting_org_short_name()
     dataset_sample_short_name = get_sample_dataset_short_name(reporting_org)
 
     return {
-        "message_type": f"DATASET_{update_type.upper()}",
+        "message_type": f"{update_type.upper()}",
         "message_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
         "dataset": {
-            "id": dataset_uuid if dataset_uuid is not None else str(uuid.uuid4()),
-            "short_name": dataset_short_name if dataset_short_name is not None else dataset_sample_short_name,
+            "id": dataset_fields.get("id", str(uuid.uuid4())),
+            "short_name": dataset_fields.get("id", dataset_sample_short_name),
             "source_type": "primary-source" if randint(0, 10) > 5 else "secondary-source",
             "licence_id": get_sample_dataset_licence_id(),
             "url": "https://www.example.org/{}.xml".format(dataset_sample_short_name),
             "last_url_update_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
             "last_metadata_update_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "reporting_org_id": reporting_org_uuid if reporting_org_uuid is not None else str(uuid.uuid4()),
+            "reporting_org_id": reporting_org_fields.get("id", str(uuid.uuid4())),
             "reporting_org_short_name": reporting_org,
         },
     }
 
 
-def generate_download_request_message(
-    dataset_uuid: str,
-    dataset_short_name: str,
-    dataset_url: str,
-    reporting_org_uuid: str,
-    reporting_org_short_name: str,
-    hash: str,
-) -> dict:
+def generate_download_request_message(dataset_fields: dict, reporting_org_fields: dict) -> dict:
     reporting_org = get_sample_reporting_org_short_name()
     dataset_sample_short_name = get_sample_dataset_short_name(reporting_org)
     return {
         "message_type": "DATASET_DOWNLOAD_REQUEST",
         "message_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
         "dataset": {
-            "id": dataset_uuid if dataset_uuid is not None else str(uuid.uuid4()),
-            "short_name": dataset_short_name if dataset_short_name is not None else dataset_sample_short_name,
+            "id": dataset_fields.get("id", str(uuid.uuid4())),
+            "short_name": dataset_fields.get("short_name", dataset_sample_short_name),
             "source_type": "primary-source" if randint(0, 10) > 5 else "secondary-source",
             "licence_id": get_sample_dataset_licence_id(),
-            "url": (
-                dataset_url
-                if dataset_url is not None
-                else "https://www.example.org/{}.xml".format(dataset_sample_short_name)
-            ),
+            "url": dataset_fields.get("url", "https://www.example.org/{}.xml".format(dataset_sample_short_name)),
             "last_url_update_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
             "last_metadata_update_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "reporting_org_id": reporting_org_uuid if reporting_org_uuid is not None else str(uuid.uuid4()),
-            "reporting_org_short_name": (
-                reporting_org_short_name if reporting_org_short_name is not None else reporting_org
+            "reporting_org_id": reporting_org_fields.get("id", str(uuid.uuid4())),
+            "reporting_org_short_name": reporting_org_fields.get("short_name", reporting_org),
+        },
+        "dataset_hash_details": {
+            "hash": dataset_fields.get("hash", "5c5d7e150145f34975485e6a4b862d5f238f7f84"),
+            "hash_excluding_generated_timestamp": dataset_fields.get(
+                "hash", "5c5d7e150145f34975485e6a4b862d5f238f7f84"
             ),
         },
-        "dataset_hash_details": {"hash": hash, "hash_excluding_generated_timestamp": hash},
     }
 
 
+def generate_dataset_check_message(dataset_fields: dict, reporting_org_fields: dict, content_changed: bool) -> dict:
+    reporting_org_sample_name = get_sample_reporting_org_short_name()
+
+    dataset_sample_name = get_sample_dataset_short_name(reporting_org_sample_name)
+
+    source_url = dataset_fields.get("source_url", "https://www.example.org/{}.xml".format(dataset_sample_name))
+
+    result = {
+        "message_type": "DATASET_CHECK_RESULT",
+        "message_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "dataset_check_result_current": {
+            "id": dataset_fields.get("id", str(uuid.uuid4())),
+            "short_name": dataset_fields.get("short_name", dataset_sample_name),
+            "reporting_org_id": reporting_org_fields.get("id", str(uuid.uuid4())),
+            "reporting_org_short_name": reporting_org_fields.get("short_name", reporting_org_sample_name),
+            "licence_id": get_sample_dataset_licence_id(),
+            "source_url": source_url,
+            "last_update_check": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "last_known_good_dataset": {
+                "cached_dataset_xml_url": "test.org/download.xml",
+                "cached_dataset_xml_etag": "KXDMHBNCLJWWUV",
+                "cached_dataset_zip_url": "test.org/download.zip",
+                "cached_dataset_zip_etag": "CLJWWUVKXDMHBN",
+                "content_length": 725211,
+                "downloaded": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "hash": "e1196c7c1fc763f45c5114ed50957981abd21720",
+                "hash_excluding_generated_timestamp": "4ed50957981abd21720e1196c7c1fc763f45c511",
+                "initial_contents": "<iati-activities><iati-activity>qweqwe",
+                "server_header_etag": "KXDMHWWUVBNCLJ",
+                "server_header_last_modified": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "source_url": source_url,
+                "verified_on_server": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            },
+            "most_recent_head_attempt": {
+                "datetime": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "error_details": {},
+                "error_occurred": False,
+                "http_status": 200,
+            },
+            "most_recent_get_attempt": {
+                "datetime": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "error_details": {},
+                "error_occurred": False,
+                "http_status": 200,
+            },
+        },
+    }  # type: dict[str, Any]
+
+    previous_result = copy.deepcopy(result["dataset_check_result_current"])
+
+    # update the date fields
+    previous_datetime = (datetime.now() - timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    previous_result["last_update_check"] = previous_datetime
+    previous_result["most_recent_head_attempt"]["datetime"] = previous_datetime
+    previous_result["most_recent_get_attempt"]["datetime"] = previous_datetime
+    previous_result["last_known_good_dataset"]["downloaded"] = previous_datetime
+    previous_result["last_known_good_dataset"]["server_header_last_modified"] = previous_datetime
+    previous_result["last_known_good_dataset"]["verified_on_server"] = previous_datetime
+
+    # update the fields that would be changed by a dataset content change
+    if content_changed:
+        previous_result["last_known_good_dataset"]["hash"] = "c5114ed50957981abd21720e1196c7c1fc763f45"
+        previous_result["last_known_good_dataset"][
+            "hash_excluding_generated_timestamp"
+        ] = "45c5114ed50957981abd21720e1196c7c1fc763f"
+
+    result["dataset_check_result_previous"] = previous_result
+
+    return result
+
+
 def generate_example_payload(args: argparse.Namespace) -> dict:
-    if args.update_type == "download_request":
-        payload = generate_download_request_message(
-            args.dataset_uuid,
-            args.dataset_short_name,
-            args.dataset_url,
-            args.reporting_org_uuid,
-            args.reporting_org_short_name,
-            args.dataset_hash,
+    dataset_fields = {f"{k}": v for k, v in map(lambda x: x.split("="), args.dataset_fields)}
+    reporting_org_fields = {f"{k}": v for k, v in map(lambda x: x.split("="), args.reporting_org_fields)}
+
+    if args.message_type == "dataset_check_result":
+        payload = generate_dataset_check_message(
+            dataset_fields, reporting_org_fields, args.dataset_check_result_content_changed
         )
-    elif args.update_type == "deleted":
-        primary_uuid = args.dataset_uuid if args.update_record_type == "dataset" else args.reporting_org_uuid
-        payload = generate_sample_delete_message(args.update_record_type, primary_uuid)
+    elif args.message_type == "dataset_download_request":
+        payload = generate_download_request_message(dataset_fields, reporting_org_fields)
+    elif args.message_type.endswith("deleted"):
+        record_type = args.message_type.replace("_deleted", "")
+        primary_uuid = (
+            dataset_fields.get("id", None) if record_type == "dataset" else reporting_org_fields.get("id", None)
+        )
+        payload = generate_sample_delete_message(record_type, primary_uuid)
     else:
-        if args.update_record_type == "dataset":
-            payload = generate_sample_dataset_message(
-                args.update_type, args.dataset_uuid, args.dataset_short_name, args.reporting_org_uuid
-            )
+        record_type = (
+            args.message_type.replace("_updated", "")
+            if args.message_type.endswith("_updated")
+            else args.message_type.replace("_created", "")
+        )
+        if record_type == "dataset":
+            payload = generate_sample_dataset_message(args.message_type, dataset_fields, reporting_org_fields)
         else:
-            payload = generate_sample_reporting_org_message(
-                args.update_type, args.reporting_org_uuid, args.reporting_org_short_name
-            )
+            payload = generate_sample_reporting_org_message(args.message_type, reporting_org_fields)
     return payload
 
 
 async def send_single_message(sender: ServiceBusSender, args: argparse.Namespace):
 
     msg_payload = generate_example_payload(args)
+
     msg_payload_as_str = json.dumps(msg_payload, indent=2)
+
     message = ServiceBusMessage(
         body=msg_payload_as_str, application_properties={"message_type": msg_payload["message_type"]}
     )
+
     await sender.send_messages(message)
+
     output = {
-        "info": "Generated and sent a sample {} message".format(args.update_type),
+        "info": "Generated and sent a sample {} message".format(args.message_type),
         "message_payload": msg_payload,
     }
+
     print(json.dumps(output, indent=2))
 
 
@@ -178,12 +241,12 @@ async def main(args: argparse.Namespace):
     conn_str = os.getenv("AZ_SERVICE_BUS_CONNECTION_STRING", "")
     servicebus_client = ServiceBusClient.from_connection_string(conn_str=conn_str, logging_enable=True)
 
-    if args.update_type == "download_request":
-        queue_name = os.getenv("AZ_SERVICE_BUS_QUEUE_NAME", "")
-        sender = servicebus_client.get_queue_sender(queue_name=queue_name)
+    sender_type, channel_name = os.getenv(args.message_type.upper() + "_SENDER", ",").split(",")
+
+    if sender_type == "queue":
+        sender = servicebus_client.get_queue_sender(queue_name=channel_name)
     else:
-        topic_name = os.getenv("AZ_SERVICE_BUS_TOPIC_NAME", "")
-        sender = servicebus_client.get_topic_sender(topic_name=topic_name)
+        sender = servicebus_client.get_topic_sender(topic_name=channel_name)
 
     await send_single_message(sender, args)
 
@@ -191,51 +254,41 @@ async def main(args: argparse.Namespace):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="IATI MQ Sample App - Producer")
     parser.add_argument(
-        "--update-type",
-        choices=["created", "updated", "deleted", "download_request"],
+        "--message-type",
+        choices=[
+            "dataset_created",
+            "dataset_updated",
+            "dataset_deleted",
+            "dataset_download_request",
+            "dataset_check_result",
+            "reporting_org_created",
+            "reporting_org_updated",
+            "reporting_org_deleted",
+        ],
         required=True,
         help="Which type of message to send",
     )
     parser.add_argument(
-        "--update-record-type",
-        choices=["dataset", "reporting_org"],
+        "--dataset-check-result-content-changed",
+        action="store_true",
         required=False,
-        help="Which type of data record to create a message for",
+        default=False,
+        help="Whether to modify the hash on a DATASET_CHECK_RESULT message",
     )
     parser.add_argument(
-        "--dataset-uuid",
+        "--dataset-fields",
         type=str,
         required=False,
-        help="Use the specified UUID in for the dataset id",
+        default=[],
+        nargs="*",
+        help="Fields to use for the dataset record, in format field=value",
     )
     parser.add_argument(
-        "--dataset-short-name",
+        "--reporting-org-fields",
         type=str,
         required=False,
-        help="Use the specified short-name for the dataset",
-    )
-    parser.add_argument(
-        "--dataset-url",
-        type=str,
-        required=False,
-        help="Use the specified dataset url",
-    )
-    parser.add_argument(
-        "--dataset-hash",
-        type=str,
-        required=False,
-        help="Dataset hash. Needed to construct valid download request messages.",
-    )
-    parser.add_argument(
-        "--reporting-org-uuid",
-        type=str,
-        required=False,
-        help="Use the specified UUID in for the reporting org id",
-    )
-    parser.add_argument(
-        "--reporting-org-short-name",
-        type=str,
-        required=False,
-        help="Use the specified short-name for the reporting org",
+        default=[],
+        nargs="*",
+        help="Fields to use for the reporting org record, in format field=value",
     )
     asyncio.run(main(parser.parse_args()))
