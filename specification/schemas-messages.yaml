@@ -2,7 +2,7 @@
 asyncapi: 3.0.0
 info:
   title: IATI Internal Message Queue Service Common Components - Messages
-  version: 0.0.11
+  version: 0.0.12
   description: |
     Definition of messages needed by apps using the IATI internal message queue
     service.
@@ -294,7 +294,7 @@ components:
             example: 2025-06-27T06:54:20+00:00
           dataset_check_result:
             $ref: "#/components/schemas/dataset_check_result"
-          dataset_check_result_previous_result:
+          dataset_check_result_previous:
             $ref: "#/components/schemas/dataset_check_result"
 
     dataset_download_attempt_result:
