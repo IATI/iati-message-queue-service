@@ -2,7 +2,7 @@
 asyncapi: 3.0.0
 info:
   title: IATI Bulk Data Service Messaging Spec
-  version: 0.0.12
+  version: 0.0.13
   description: Messaging specification for the IATI Bulk Data Service App
 
 defaultContentType: application/json

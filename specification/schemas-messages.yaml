@@ -2,7 +2,7 @@
 asyncapi: 3.0.0
 info:
   title: IATI Internal Message Queue Service Common Components - Messages
-  version: 0.0.12
+  version: 0.0.13
   description: |
     Definition of messages needed by apps using the IATI internal message queue
     service.
@@ -468,69 +468,105 @@ components:
           example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
 
     reporting_org:
-      title: An IATI Registry reporting_org record (without contact info).
+      description: An IATI Registry reporting_org record (without contact info).
       type: object
-      required:
-        - id
-        - human_readable_name
-        - iati_identifier
-        - iati_organisation_type
-        - number_of_publisher_datasets
-        - short_name
-        - reporting_source_type
       properties:
+        created_date:
+          type: string
+          format: date-time
+          example: '2023-08-27T07:31:06+00:00'
+          nullable: true
         data_portal_url:
           type: string
           format: url
-          example: https://www.example.org/data-portal
+          example: 'https://www.example.org/data-portal'
+          nullable: true
         default_licence_id:
           type: string
           example: gpl-3.0
+          nullable: true
         description:
           type: string
           example: |
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
             eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          nullable: true
         exclusions_policy_url:
           type: string
           format: url
-          example: https://www.example.org/exclusions-policy
+          example: 'https://www.example.org/exclusions-policy'
+          nullable: true
         first_publication_date:
           type: string
           format: date-time
-          example: 2025-06-27T07:31:06+00:00
+          example: '2025-06-27T07:31:06+00:00'
+          nullable: true
         hq_country:
+          description: |
+            This is a codelist field. Valid values come from the code list:
+            https://iatistandard.org/en/iati-standard/203/codelists/country/
           type: string
-          example: Colombia
+          example: GB
+          nullable: true
         human_readable_name:
           type: string
           example: Aid Agency
-        iati_identifier:
-          type: string
-          example: CO-ABC-123456
-        iati_organisation_type:
-          type: string
-          example: Regional NGO
+          nullable: false
         id:
           type: string
           format: uuid
           example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
-        number_of_published_datasets:
-          type: number
-          format: int
-          example: 12
-        region:
+          nullable: false
+        organisation_identifier:
           type: string
-          example: South America, regional
+          example: CO-ABC-123456
+          nullable: true
+        organisation_type:
+          description: |
+            This is a codelist field. Valid values come from the code list:
+            https://iatistandard.org/en/iati-standard/203/codelists/organisationtype/
+          type: string
+          example: 23
+          nullable: true
+        region:
+          description: |
+            This is a codelist field. Valid values come from the code list:
+            https://iatistandard.org/en/iati-standard/203/codelists/region/
+          type: string
+          example: 889
+          nullable: true
         reporting_source_type:
           type: string
           example: primary-source
           enum:
             - primary-source
             - secondary-source
+          nullable: true
         short_name:
           type: string
           example: aidagcy
+          nullable: false
+        website:
+          type: string
+          format: url
+          example: 'https://www.example.org/'
+          nullable: true
+      required:
+        - created_date
+        - data_portal_url
+        - default_licence_id
+        - description
+        - exclusions_policy_url
+        - first_publication_date
+        - hq_country
+        - human_readable_name
+        - id
+        - organisation_identifier
+        - organisation_type
+        - region
+        - reporting_source_type
+        - short_name
+        - website
     reporting_org_action:
       title: An action taken on an IATI Registry reporting org record.
       type: object
