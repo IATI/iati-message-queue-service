@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: Consumer - service loop",
+            "name": "Debugger: Consumer - service loop",
             "type": "debugpy",
             "request": "launch",
             "program": "sample-python-apps/src/consumer_azsb_library.py",
@@ -17,6 +17,32 @@
             "console": "integratedTerminal",
             "envFile": "${workspaceFolder}/sample-python-apps/.env"
         },
-
+        {
+            "name": "Debugger: Producer - send created dataset",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "sample-python-apps/src/producer_azsb_library.py",
+            "args": [
+                "--message-type",
+                "dataset_created",
+            ],
+            "console": "integratedTerminal",
+            "envFile": "${workspaceFolder}/sample-python-apps/.env"
+        },        
+        {
+            "name": "Debugger: Producer - send dataset check result",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "sample-python-apps/src/producer_azsb_library.py",
+            "args": [
+                "--message-type",
+                "dataset_check_result",
+                "--dataset-fields",
+                "id=b1f6576e-5911-4d3e-80d1-d55f1fa75ca4",
+                "hash=3d65e7b3433f8231e9ba83249509"
+            ],
+            "console": "integratedTerminal",
+            "envFile": "${workspaceFolder}/sample-python-apps/.env"
+        },
     ]
 }

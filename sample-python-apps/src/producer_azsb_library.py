@@ -37,7 +37,7 @@ def generate_sample_delete_message(record_type_to_delete: str, uuid_to_use: str 
 
     return {
         "message_type": "{}_DELETED".format(record_type_to_delete.upper()),
-        "message_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "message_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00"),
         record_type_to_delete: {
             "id": uuid_to_use if uuid_to_use is not None else str(uuid.uuid4()),
         },
@@ -50,22 +50,23 @@ def generate_sample_reporting_org_message(update_type: str, reporting_org_fields
 
     return {
         "message_type": f"{update_type.upper()}",
-        "message_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "message_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00"),
         "reporting_org": {
+            "created_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00"),
             "data_portal_url": "https://www.example.org/data-portal/",
             "default_licence_id": "cc-by",
             "description": fake.text(),
             "exclusions_policy_url": "https://www.example.org/exclusions.html",
-            "first_publication_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "hq_country": "United Kingdom",
+            "first_publication_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00"),
+            "hq_country": "GB",
             "human_readable_name": reporting_org_name,
-            "iati_identifier": "GB-AGY-" + str(randint(100, 900)),
-            "iati_organisation_type": "National NGO",
+            "organisation_identifier": "GB-AGY-" + str(randint(100, 900)),
+            "organisation_type": "73",
             "id": reporting_org_fields.get("id", str(uuid.uuid4())),
-            "number_of_published_datasets": randint(0, 50),
-            "region": "Europe",
+            "region": "89",
             "reporting_source_type": "primary-source" if randint(0, 10) > 5 else "secondary-source",
             "short_name": reporting_org_short_name_calc,
+            "website": "https://www.example.org",
         },
     }
 
@@ -76,15 +77,15 @@ def generate_sample_dataset_message(update_type: str, dataset_fields: dict, repo
 
     return {
         "message_type": f"{update_type.upper()}",
-        "message_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "message_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00"),
         "dataset": {
             "id": dataset_fields.get("id", str(uuid.uuid4())),
             "short_name": dataset_fields.get("id", dataset_sample_short_name),
             "source_type": "primary-source" if randint(0, 10) > 5 else "secondary-source",
             "licence_id": get_sample_dataset_licence_id(),
             "url": "https://www.example.org/{}.xml".format(dataset_sample_short_name),
-            "last_url_update_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "last_metadata_update_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "last_url_update_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00"),
+            "last_metadata_update_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00"),
             "reporting_org_id": reporting_org_fields.get("id", str(uuid.uuid4())),
             "reporting_org_short_name": reporting_org,
         },
@@ -96,15 +97,15 @@ def generate_download_request_message(dataset_fields: dict, reporting_org_fields
     dataset_sample_short_name = get_sample_dataset_short_name(reporting_org)
     return {
         "message_type": "DATASET_DOWNLOAD_REQUEST",
-        "message_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "message_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00"),
         "dataset": {
             "id": dataset_fields.get("id", str(uuid.uuid4())),
             "short_name": dataset_fields.get("short_name", dataset_sample_short_name),
             "source_type": "primary-source" if randint(0, 10) > 5 else "secondary-source",
             "licence_id": get_sample_dataset_licence_id(),
             "url": dataset_fields.get("url", "https://www.example.org/{}.xml".format(dataset_sample_short_name)),
-            "last_url_update_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "last_metadata_update_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "last_url_update_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00"),
+            "last_metadata_update_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00"),
             "reporting_org_id": reporting_org_fields.get("id", str(uuid.uuid4())),
             "reporting_org_short_name": reporting_org_fields.get("short_name", reporting_org),
         },
@@ -126,7 +127,7 @@ def generate_dataset_check_message(dataset_fields: dict, reporting_org_fields: d
 
     result = {
         "message_type": "DATASET_CHECK_RESULT",
-        "message_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "message_date": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00"),
         "dataset_check_result_current": {
             "id": dataset_fields.get("id", str(uuid.uuid4())),
             "short_name": dataset_fields.get("short_name", dataset_sample_name),
@@ -134,30 +135,30 @@ def generate_dataset_check_message(dataset_fields: dict, reporting_org_fields: d
             "reporting_org_short_name": reporting_org_fields.get("short_name", reporting_org_sample_name),
             "licence_id": get_sample_dataset_licence_id(),
             "source_url": source_url,
-            "last_update_check": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "last_update_check": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00"),
             "last_known_good_dataset": {
                 "cached_dataset_xml_url": "test.org/download.xml",
                 "cached_dataset_xml_etag": "KXDMHBNCLJWWUV",
                 "cached_dataset_zip_url": "test.org/download.zip",
                 "cached_dataset_zip_etag": "CLJWWUVKXDMHBN",
                 "content_length": 725211,
-                "downloaded": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "downloaded": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00"),
                 "hash": "e1196c7c1fc763f45c5114ed50957981abd21720",
                 "hash_excluding_generated_timestamp": "4ed50957981abd21720e1196c7c1fc763f45c511",
                 "initial_contents": "<iati-activities><iati-activity>qweqwe",
                 "server_header_etag": "KXDMHWWUVBNCLJ",
-                "server_header_last_modified": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "server_header_last_modified": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00"),
                 "source_url": source_url,
-                "verified_on_server": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "verified_on_server": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00"),
             },
             "most_recent_head_attempt": {
-                "datetime": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "datetime": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00"),
                 "error_details": {},
                 "error_occurred": False,
                 "http_status": 200,
             },
             "most_recent_get_attempt": {
-                "datetime": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "datetime": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+00:00"),
                 "error_details": {},
                 "error_occurred": False,
                 "http_status": 200,
@@ -168,7 +169,7 @@ def generate_dataset_check_message(dataset_fields: dict, reporting_org_fields: d
     previous_result = copy.deepcopy(result["dataset_check_result_current"])
 
     # update the date fields
-    previous_datetime = (datetime.now() - timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    previous_datetime = (datetime.now() - timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%S+00:00")
     previous_result["last_update_check"] = previous_datetime
     previous_result["most_recent_head_attempt"]["datetime"] = previous_datetime
     previous_result["most_recent_get_attempt"]["datetime"] = previous_datetime
