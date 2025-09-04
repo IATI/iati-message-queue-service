@@ -2,7 +2,7 @@
 asyncapi: 3.0.0
 info:
   title: IATI Internal Message Queue Service Common Components - Channels
-  version: 0.0.13
+  version: 0.1.0
   description: |
     Definition of channels (topics, subscriptions, queues) needed by apps using
     the IATI internal message queue service.

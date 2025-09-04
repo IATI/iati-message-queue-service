@@ -2,7 +2,7 @@
 asyncapi: 3.0.0
 info:
   title: IATI Internal Message Queue Service Common Components - Messages
-  version: 0.0.13
+  version: 0.1.0
   description: |
     Definition of messages needed by apps using the IATI internal message queue
     service.
@@ -631,6 +631,18 @@ components:
           required:
             - error_type
           properties:
+            detailed_message:
+              type: string
+              description: |
+                A detailed error message, often produced by the relevant
+                component library.
+              example: |
+                "requests.exceptions.ConnectionError:
+                HTTPConnectionPool(host='www.iatistandard.com', port=80): Max
+                retries exceeded with url: / (Caused by
+                NameResolutionError(\"<urllib3.connection.HTTPConnection object
+                at 0x74b4aecaa9c0>: Failed to resolve 'www.iatistandard.com'
+                ([Errno -2] Name or service not known)\"))"
             error_type:
               description: |
                 The type of error that occurred. `other_error` indicates any
@@ -660,17 +672,13 @@ components:
               type: string
               description: A succinct message from the relevant IATI app.
               example: Download attempt failed due to connection timeout
-            system_message:
-              type: string
-              description: The error message from the relevant Python library.
-              example: |
-                "requests.exceptions.ConnectionError:
-                HTTPConnectionPool(host='www.iatistandard.com', port=80): Max
-                retries exceeded with url: / (Caused by
-                NameResolutionError(\"<urllib3.connection.HTTPConnection object
-                at 0x74b4aecaa9c0>: Failed to resolve 'www.iatistandard.com'
-                ([Errno -2] Name or service not known)\"))"
-            url:
+            source_url:
+              description: |
+                The URL which caused the error. Note that this may not be the
+                same as the current value of `source_url` because if the
+                dataset's registered source_url is updated then the Bulk Data
+                Service proceeds straight to a full download attempt and does
+                not attempt a `HEAD` request.
               type: string
               format: url
               example: https://www.example.com/files/aidagcy/aidagcy-activity-file.xml
@@ -704,6 +712,18 @@ components:
         error_details:
           type: object
           properties:
+            detailed_message:
+              type: string
+              description: |
+                A detailed error message, often produced by the relevant
+                component library.
+              example: |
+                "requests.exceptions.ConnectionError:
+                HTTPConnectionPool(host='www.iatistandard.com', port=80): Max
+                retries exceeded with url: / (Caused by
+                NameResolutionError(\"<urllib3.connection.HTTPConnection object
+                at 0x74b4aecaa9c0>: Failed to resolve 'www.iatistandard.com'
+                ([Errno -2] Name or service not known)\"))"
             error_type:
               type: string
               description: |
@@ -741,17 +761,12 @@ components:
               type: string
               description: A succinct message from the relevant IATI app.
               example: Download attempt failed due to connection timeout
-            system_message:
-              type: string
-              description: The error message from the relevant Python library.
-              example: |
-                "requests.exceptions.ConnectionError:
-                HTTPConnectionPool(host='www.iatistandard.com', port=80): Max
-                retries exceeded with url: / (Caused by
-                NameResolutionError(\"<urllib3.connection.HTTPConnection object
-                at 0x74b4aecaa9c0>: Failed to resolve 'www.iatistandard.com'
-                ([Errno -2] Name or service not known)\"))"
-            url:
+            source_url:
+              description: |
+                The url which produced the `GET` error. Note that this may not
+                be the same as the current value of `source_url` because the
+                `source_url` may have recently been updated and there may not
+                yet be any download results for the new url.
               type: string
               format: url
               example: https://www.example.com/files/aidagcy/aidagcy-activity-file.xml
