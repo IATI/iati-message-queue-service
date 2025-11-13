@@ -2,7 +2,7 @@
 asyncapi: 3.0.0
 info:
   title: IATI Registry Messaging Spec
-  version: 0.1.0
+  version: 0.2.0
   description: Messaging specification for the SuiteCRM-based IATI Registry.
 
 defaultContentType: application/json
