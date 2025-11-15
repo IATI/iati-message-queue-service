@@ -2,7 +2,7 @@
 asyncapi: 3.0.0
 info:
   title: IATI Internal Message Queue Service Common Components - Messages
-  version: 0.1.0
+  version: 0.2.0
   description: |
     Definition of messages needed by apps using the IATI internal message queue
     service.
@@ -47,18 +47,47 @@ components:
             example: 2025-06-27T06:54:20+00:00
           dataset:
             $ref: "#/components/schemas/dataset"
-          dataset_action:
-            $ref: "#/components/schemas/dataset_action"
+          dataset_actions:
+            $ref: "#/components/schemas/dataset_action_list"
+      examples:
+        - name: created_example
+          payload:
+            message_type: "DATASET_CREATED"
+            message_date: "2025-06-27T06:54:20+00:00"
+            dataset:
+              id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+              short_name: "aidagcy-activity-3"
+              source_type: "primary_source"
+              licence_id: "gpl-3.0"
+              url: "https://www.example.org/datasets/activity3.xml"
+              last_url_update_date: "2025-06-27T06:54:20+00:00"
+              last_metadata_update_date: "2025-06-27T06:54:20+00:00"
+              reporting_org_id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+              reporting_org_short_name: "aidagcy"
+            dataset_actions:
+              - id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+                dataset_id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+                action_type: "create"
+                created_date: "2025-06-27T06:54:20+00:00"
+                responsible_org_id: "1064831d-019d-47f9-a87d-9605d93400d6"
+                responsible_org_name: "Aid Agency South"
+                user_application_id: "dd80e2e6-ee42-4da6-bfc6-e585480d34a9"
+                user_application_name: "Register Your Data WebApp"
+                user_name: "John Smith"
+                user_id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
 
     dataset_updated:
       name: dataset_updated
       title: Notification that a dataset has been updated.
       summary: |
         Message indicating that a dataset record has been deleted on the
-        Registry. The `message_id` in this spec serves to identify the
-        message type is not itself part of the message, but this message must
-        contain an application header called `message_type` that contains the
-        `DATASET_UPDATED` in uppercase.
+        Registry. The `message_id` in this spec serves to identify the message
+        type is not itself part of the message, but this message must contain an
+        application header called `message_type` that contains the
+        `DATASET_UPDATED` in uppercase. Note: a single user operation to update
+        their dataset may result in multiple dataset actions being recorded
+        because the updating of urls and the visibility status are logged
+        separately.
       headers:
         type: object
         properties:
@@ -86,8 +115,69 @@ components:
             example: 2025-06-27T06:54:20+00:00
           dataset:
             $ref: "#/components/schemas/dataset"
-          dataset_action:
-            $ref: "#/components/schemas/dataset_action"
+          dataset_actions:
+            $ref: "#/components/schemas/dataset_action_list"
+      examples:
+        - name: update that changes url only
+          payload:
+            message_type: "DATASET_UPDATED"
+            message_date: "2025-06-27T06:54:20+00:00"
+            dataset:
+              id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+              short_name: "aidagcy-activity-3"
+              source_type: "primary_source"
+              licence_id: "gpl-3.0"
+              url: "https://www.example.org/datasets/activity3.xml"
+              last_url_update_date: "2025-06-27T06:54:20+00:00"
+              last_metadata_update_date: "2025-06-27T06:54:20+00:00"
+              reporting_org_id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+              reporting_org_short_name: "aidagcy"
+            dataset_actions:
+              - id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+                dataset_id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+                action_type: "update_url"
+                created_date: "2025-06-27T06:54:20+00:00"
+                responsible_org_id: "1064831d-019d-47f9-a87d-9605d93400d6"
+                responsible_org_name: "Aid Agency South"
+                user_application_id: "dd80e2e6-ee42-4da6-bfc6-e585480d34a9"
+                user_application_name: "Register Your Data WebApp"
+                user_name: "John Smith"
+                user_id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+        - name: update that changes url and other fields
+          payload:
+            message_type: "DATASET_UPDATED"
+            message_date: "2025-06-27T06:54:20+00:00"
+            dataset:
+              id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+              short_name: "aidagcy-activity-3"
+              source_type: "primary_source"
+              licence_id: "gpl-3.0"
+              url: "https://www.example.org/datasets/activity3.xml"
+              last_url_update_date: "2025-06-27T06:54:20+00:00"
+              last_metadata_update_date: "2025-06-27T06:54:20+00:00"
+              reporting_org_id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+              reporting_org_short_name: "aidagcy"
+            dataset_actions:
+              - id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+                dataset_id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+                action_type: "update_url"
+                created_date: "2025-06-27T06:54:20+00:00"
+                responsible_org_id: "1064831d-019d-47f9-a87d-9605d93400d6"
+                responsible_org_name: "Aid Agency South"
+                user_application_id: "dd80e2e6-ee42-4da6-bfc6-e585480d34a9"
+                user_application_name: "Register Your Data WebApp"
+                user_name: "John Smith"
+                user_id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+              - id: "b52bc269-0595-4814-8075-eccfece49dd9"
+                dataset_id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+                action_type: "update_metadata"
+                created_date: "2025-06-27T06:54:20+00:00"
+                responsible_org_id: "1064831d-019d-47f9-a87d-9605d93400d6"
+                responsible_org_name: "Aid Agency South"
+                user_application_id: "dd80e2e6-ee42-4da6-bfc6-e585480d34a9"
+                user_application_name: "Register Your Data WebApp"
+                user_name: "John Smith"
+                user_id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
 
     dataset_deleted:
       name: dataset_deleted
@@ -132,8 +222,34 @@ components:
                 type: string
                 format: uuid
                 example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
-          dataset_action:
-            $ref: "#/components/schemas/dataset_action"
+          dataset_actions:
+            $ref: "#/components/schemas/dataset_action_list"
+      examples:
+        - name: A dataset deleted example
+          payload:
+            message_type: "DATASET_DELETED"
+            message_date: "2025-06-27T06:54:20+00:00"
+            dataset:
+              id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+              short_name: "aidagcy-activity-3"
+              source_type: "primary_source"
+              licence_id: "gpl-3.0"
+              url: "https://www.example.org/datasets/activity3.xml"
+              last_url_update_date: "2025-06-27T06:54:20+00:00"
+              last_metadata_update_date: "2025-06-27T06:54:20+00:00"
+              reporting_org_id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+              reporting_org_short_name: "aidagcy"
+            dataset_actions:
+              - id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+                dataset_id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+                action_type: "delete"
+                created_date: "2025-06-27T06:54:20+00:00"
+                responsible_org_id: "1064831d-019d-47f9-a87d-9605d93400d6"
+                responsible_org_name: "Aid Agency South"
+                user_application_id: "dd80e2e6-ee42-4da6-bfc6-e585480d34a9"
+                user_application_name: "Register Your Data WebApp"
+                user_name: "John Smith"
+                user_id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
 
     reporting_org_created:
       name: reporting_org_created
@@ -171,8 +287,40 @@ components:
             example: 2025-06-27T06:54:20+00:00
           reporting_org:
             $ref: "#/components/schemas/reporting_org"
-          reporting_org_action:
-            $ref: "#/components/schemas/reporting_org_action"
+          reporting_org_actions:
+            $ref: "#/components/schemas/reporting_org_action_list"
+      examples:
+        - name: created_example
+          payload:
+            message_type: "REPORTING_ORG_CREATED"
+            message_date: "2025-06-27T06:54:20+00:00"
+            reporting_org:
+              created_date: "2025-06-27T06:54:20+00:00"
+              data_portal_url: "https://data.example.org/organizations/aidagcy"
+              default_license_id: "gpl-3.0"
+              description: "Aid Agency Country Y is an international aid agency."
+              exclusions_policy_url: "https://www.example.org/aidagcy/exclusions"
+              first_publication_date: "2025-06-27T06:54:20+00:00"
+              hq_country_code: "YY"
+              human_readable_name: "Aid Agency Country Y"
+              id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+              organisation_identifier: "GB-AID-AGCY"
+              organisation_type: "10"
+              region: "88"
+              reporting_source_type: "primary_source"
+              short_name: "aidagcy"
+              website_url: "https://www.example.org/aidagcy"
+            reporting_org_actions:
+              - id: "2e60bb06-0d48-4683-a03e-1d8d1e566fdc"
+                reporting_org_id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+                action_type: "create"
+                created_date: "2025-06-27T06:54:20+00:00"
+                responsible_org_id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
+                responsible_org_name: "Aid Agency South"
+                user_application_id: "dd80e2e6-ee42-4da6-bfc6-e585480d34a9"
+                user_application_name: "Register Your Data WebApp"
+                user_name: "John Smith"
+                user_id: "83baecf7-771c-474b-a561-50af49d0e0ec"
 
     reporting_org_updated:
       name: reporting_org_updated
@@ -210,8 +358,8 @@ components:
             example: 2025-06-27T06:54:20+00:00
           reporting_org:
             $ref: "#/components/schemas/reporting_org"
-          reporting_org_action:
-            $ref: "#/components/schemas/reporting_org_action"
+          reporting_org_actions:
+            $ref: "#/components/schemas/reporting_org_action_list"
 
     reporting_org_deleted:
       name: reporting_org_deleted
@@ -256,8 +404,8 @@ components:
                 type: string
                 format: uuid
                 example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
-          reporting_org_action:
-            $ref: "#/components/schemas/reporting_org_action"
+          reporting_org_actions:
+            $ref: "#/components/schemas/reporting_org_action_list"
 
     dataset_check_result:
       name: dataset_check_result
@@ -397,9 +545,9 @@ components:
         source_type:
           type: string
           enum:
-            - primary-source
-            - secondary-source
-          example: primary-source
+            - primary_source
+            - secondary_source
+          example: primary_source
         licence_id:
           type: string
           example: gpl-3.0
@@ -428,17 +576,24 @@ components:
       type: object
       required:
         - id
+        - created_date
         - dataset_id
         - action_type
-        - action_created
-        - user_application
-        - user_name
+        - responsible_org_id
+        - responsible_org_name
+        - user_application_id
+        - user_application_name
         - user_id
+        - user_name
       properties:
         id:
           type: string
           format: uuid
           example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
+        created_date:
+          type: string
+          format: date-time
+          example: 2025-06-27T06:54:20+00:00
         dataset_id:
           type: string
           format: uuid
@@ -447,15 +602,23 @@ components:
           type: string
           enum:
             - create
-            - update_url
             - update_metadata
+            - update_url
+            - update_visibility
             - delete
           example: update_url
-        action_created:
+        responsible_org_id:
           type: string
-          format: date-time
-          example: 2025-06-27T06:54:20+00:00
-        user_application:
+          format: uuid
+          example: 1064831d-019d-47f9-a87d-9605d93400d6
+        responsible_org_name:
+          type: string
+          example: Aid Agency South
+        user_application_id:
+          type: string
+          format: uuid
+          example: dd80e2e6-ee42-4da6-bfc6-e585480d34a9
+        user_application_name:
           type: string
           example: Register Your Data WebApp
         user_name:
@@ -466,6 +629,12 @@ components:
           type: string
           format: uuid
           example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
+
+    dataset_action_list:
+      title: A list of IATI Registry dataset actions.
+      type: array
+      items:
+        $ref: "#/components/schemas/dataset_action"
 
     reporting_org:
       description: An IATI Registry reporting_org record (without contact info).
@@ -537,10 +706,10 @@ components:
           nullable: true
         reporting_source_type:
           type: string
-          example: primary-source
+          example: primary_source
           enum:
-            - primary-source
-            - secondary-source
+            - primary_source
+            - secondary_source
           nullable: true
         short_name:
           type: string
@@ -571,14 +740,25 @@ components:
       title: An action taken on an IATI Registry reporting org record.
       type: object
       required:
+        - action_type
+        - created_date
         - id
         - reporting_org_id
-        - action_type
-        - action_created
         - user_application
         - user_name
         - user_id
       properties:
+        action_type:
+          type: string
+          enum:
+            - create
+            - update
+            - delete
+          example: update
+        created_date:
+          type: string
+          format: date-time
+          example: 2025-06-27T06:54:20+00:00
         id:
           type: string
           format: uuid
@@ -587,17 +767,6 @@ components:
           type: string
           format: uuid
           example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
-        action_type:
-          type: string
-          enum:
-            - create
-            - update
-            - delete
-          example: update
-        action_created:
-          type: string
-          format: date-time
-          example: 2025-06-27T06:54:20+00:00
         user_application:
           type: string
           example: Register Your Data WebApp
@@ -609,6 +778,12 @@ components:
           type: string
           format: uuid
           example: 5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8
+
+    reporting_org_action_list:
+      title: A list of IATI Registry reporting org actions.
+      type: array
+      items:
+        $ref: "#/components/schemas/reporting_org_action"
 
     dataset_head_request_attempt_result:
       title: |
