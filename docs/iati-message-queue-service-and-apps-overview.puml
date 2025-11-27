@@ -11,7 +11,7 @@ skinparam noteFontSize 10
 !include <azure/Storage/AzureBlobStorage>
 
 
-AzureServiceBus(IATIMessageQueueService, "\nIATI Message Queue Service", "iati-mq-INSTANCE")
+AzureServiceBus(IATIMessageQueueService, "\nIATI Message Queue Service", "iati-mq")
 
 AzureContainerInstance(BulkDataServiceApp, "\nBulk Data Service App", "bulk-data-service-INSTANCE")
 
@@ -23,38 +23,38 @@ AzureDatabaseForPostgreSQL(BDSPersistentStorage, "Bulk Data Service Persistent D
 
 component SuiteCRM
 
-component Dashboard
+component "Dashboard" as Dashboard
 
 note left of BulkDataServiceApp
 App which coordinates the checking of dataset downloads
 end note
 
 note right of SuiteCRM
-Connections from an app to the Message Queue Service are denoted by edges that begin either with **publish:** or **consume:**. The edge description lists the action type and the <<""topic"">> or <<""subscription"">> name (without the instance postfix).
+Connections from an app to the Message Queue Service are denoted by edges that begin either with **publish:** or **consume:**. The edge description lists the action type and the <<""topic"">> or <<""subscription"">> name.
 end note
 
 
 SuiteCRM -down-> IATIMessageQueueService : **publish**:\n<<""iati-mq-registry-changes-topic"">>\nDATASET_CREATED,\nDATASET_UPDATED,\nDATASET_DELETED,\n\nREPORTING_ORG_CREATED,\nREPORTING_ORG_UPDATED,\nREPORTING_ORG_DELETED
 
-Dashboard --( IATIMessageQueueService : **consume**:\n<<""iati-mq-registry-changes-sub-dashboard"">>\nDATASET_CREATED,\nDATASET_UPDATED,\nDATASET_DELETED,\n\nREPORTING_ORG_CREATED,\nREPORTING_ORG_UPDATED,\nREPORTING_ORG_DELETED
+Dashboard --( IATIMessageQueueService : **consume**:\n<<""iati-mq-registry-changes-sub-dashboard-[dev|prod]"">>\nDATASET_CREATED,\nDATASET_UPDATED,\nDATASET_DELETED,\n\nREPORTING_ORG_CREATED,\nREPORTING_ORG_UPDATED,\nREPORTING_ORG_DELETED
 
-Dashboard --( IATIMessageQueueService : **consume**:\n<<""iati-mq-dataset-check-results-sub-dashboard"">>\nDATASET_CHECK_RESULT
+Dashboard --( IATIMessageQueueService : **consume**:\n<<""iati-mq-dataset-check-results-sub-dashboard-[dev|prod]"">>\nDATASET_CHECK_RESULT
 
-BulkDataServiceApp --> IATIMessageQueueService : **publish**:\n<<""iati-mq-dataset-download-request-queue"">>\n<<""iati-mq-dataset-high-priority-download-request-queue"">>\nDATASET_DOWNLOAD_REQUEST
+BulkDataServiceApp --> IATIMessageQueueService : **publish**:\n<<""iati-mq-dataset-download-request-queue-[dev|prod]"">>\n<<""iati-mq-dataset-high-priority-download-request-queue-[dev|prod]"">>\nDATASET_DOWNLOAD_REQUEST
 
-BulkDataServiceApp --> IATIMessageQueueService : **publish**:\n<<""iati-mq-dataset-check-results-topic"">>\nDATASET_CHECK_RESULT
+BulkDataServiceApp --> IATIMessageQueueService : **publish**:\n<<""iati-mq-dataset-check-results-topic-[dev|prod]"">>\nDATASET_CHECK_RESULT
 
-BulkDataServiceApp -up--( IATIMessageQueueService : **consume**:\n<<""iati-mq-registry-changes-sub-bds"">>\nDATASET_CREATED,\nDATASET_UPDATED,\nDATASET_DELETED,\n\nREPORTING_ORG_CREATED,\nREPORTING_ORG_UPDATED,\nREPORTING_ORG_DELETED
+BulkDataServiceApp -up--( IATIMessageQueueService : **consume**:\n<<""iati-mq-registry-changes-sub-bds-[dev|prod]"">>\nDATASET_CREATED,\nDATASET_UPDATED,\nDATASET_DELETED,\n\nREPORTING_ORG_CREATED,\nREPORTING_ORG_UPDATED,\nREPORTING_ORG_DELETED
 
-BulkDataServiceApp --( IATIMessageQueueService : **consume**:\n<<""iati-mq-dataset-download-results-sub-bds"">>\nDATASET_DOWNLOAD_ATTEMPT_RESULT
+BulkDataServiceApp --( IATIMessageQueueService : **consume**:\n<<""iati-mq-dataset-download-results-sub-bds-[dev|prod]"">>\nDATASET_DOWNLOAD_ATTEMPT_RESULT
 
 BulkDataServiceApp --> BulkDataServiceWebsite : upload bulk ZIP
 
 BulkDataServiceApp <--> BDSPersistentStorage : save state
 
-DataDownloader --( IATIMessageQueueService : **consume**:\n<<""iati-mq-dataset-download-request-queue"">>\n<<""iati-mq-dataset-high-priority-download-request-queue"">>\nDATASET_DOWNLOAD_REQUEST
+DataDownloader --( IATIMessageQueueService : **consume**:\n<<""iati-mq-dataset-download-request-queue-[dev|prod]"">>\n<<""iati-mq-dataset-high-priority-download-request-queue-[dev|prod]"">>\nDATASET_DOWNLOAD_REQUEST
 
-DataDownloader -> IATIMessageQueueService : **publish**:\n<<""iati-mq-dataset-download-results-topic"">>\nDATASET_DOWNLOAD_ATTEMPT_RESULT
+DataDownloader -> IATIMessageQueueService : **publish**:\n<<""iati-mq-dataset-download-results-topic-[dev|prod]"">>\nDATASET_DOWNLOAD_ATTEMPT_RESULT
 
 DataDownloader --> BulkDataServiceWebsite : upload individual\nIATI datasets\n(XML and ZIP)
 
