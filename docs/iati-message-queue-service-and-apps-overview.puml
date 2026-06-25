@@ -2,6 +2,15 @@
 scale 2000*1600
 
 skinparam noteFontSize 10
+skinparam legendBackgroundColor #FFFFFF
+
+' === Line status convention ===
+' Connections that are NOT YET IMPLEMENTED are drawn grey and dotted,
+' with a grey label, e.g.:
+'   A -[#AAAAAA,dotted]-> B : <color:#AAAAAA>label</color>
+' NOTE: <color> does not span \n line breaks, so each line of a multi-line
+' label must be wrapped separately, e.g.:
+'   <color:#AAAAAA>line1</color>\n<color:#AAAAAA>line2</color>
 
 !include <azure/AzureCommon>
 !include <azure/Compute/AzureFunction>
@@ -15,11 +24,15 @@ AzureServiceBus(IATIMessageQueueService, "\nIATI Message Queue Service", "iati-m
 
 AzureContainerInstance(BulkDataServiceApp, "\nBulk Data Service App", "bulk-data-service-INSTANCE")
 
-AzureFunction(DataDownloader, "\nData Downloader", "")
+AzureFunction(DataDownloader, "\n<color:#AAAAAA>Data Downloader</color>", "")
 
 AzureBlobStorage(BulkDataServiceWebsite, "\nBulk Data Service Website", "bulk-data.iatistadnard.org")
 
 AzureDatabaseForPostgreSQL(BDSPersistentStorage, "Bulk Data Service Persistent Data Storage", "")
+
+AzureFunction(ActivityStream, "\nIATI Activity Stream", "")
+
+AzureDatabaseForPostgreSQL(ActivityStreamPersistentStorage, "Activity Stream Persistent Data Storage", "")
 
 component SuiteCRM
 
@@ -36,26 +49,40 @@ end note
 
 SuiteCRM -down-> IATIMessageQueueService : **publish**:\n<<""iati-mq-registry-changes-topic"">>\nDATASET_CREATED,\nDATASET_UPDATED,\nDATASET_DELETED,\n\nREPORTING_ORG_CREATED,\nREPORTING_ORG_UPDATED,\nREPORTING_ORG_DELETED
 
-Dashboard --( IATIMessageQueueService : **consume**:\n<<""iati-mq-registry-changes-sub-dashboard-[dev|prod]"">>\nDATASET_CREATED,\nDATASET_UPDATED,\nDATASET_DELETED,\n\nREPORTING_ORG_CREATED,\nREPORTING_ORG_UPDATED,\nREPORTING_ORG_DELETED
+Dashboard -( IATIMessageQueueService : **consume**:\n<<""iati-mq-registry-changes-sub-dashboard-[dev|prod]"">>\nDATASET_CREATED,\nDATASET_UPDATED,\nDATASET_DELETED,\n\nREPORTING_ORG_CREATED,\nREPORTING_ORG_UPDATED,\nREPORTING_ORG_DELETED
 
-Dashboard --( IATIMessageQueueService : **consume**:\n<<""iati-mq-dataset-check-results-sub-dashboard-[dev|prod]"">>\nDATASET_CHECK_RESULT
+Dashboard -( IATIMessageQueueService : **consume**:\n<<""iati-mq-dataset-check-results-sub-dashboard-[dev|prod]"">>\nDATASET_CHECK_RESULT
 
-BulkDataServiceApp --> IATIMessageQueueService : **publish**:\n<<""iati-mq-dataset-download-request-queue-[dev|prod]"">>\n<<""iati-mq-dataset-high-priority-download-request-queue-[dev|prod]"">>\nDATASET_DOWNLOAD_REQUEST
+ActivityStream --( IATIMessageQueueService : **consume**:\n<<""iati-mq-registry-changes-sub-dashboard-[dev|prod]"">>\nDATASET_CREATED,\nDATASET_UPDATED,\nDATASET_DELETED,\n\n<color:#AAAAAA>REPORTING_ORG_CREATED,</color>\n<color:#AAAAAA>REPORTING_ORG_UPDATED,</color>\n<color:#AAAAAA>REPORTING_ORG_DELETED</color>
+
+ActivityStream --( IATIMessageQueueService : **consume**:\n<<""iati-mq-dataset-check-results-sub-dashboard-[dev|prod]"">>\nDATASET_CHECK_RESULT
+
+ActivityStream <-> ActivityStreamPersistentStorage : read/save state
+
+BulkDataServiceApp -[#AAAAAA,dotted]-> IATIMessageQueueService : <color:#AAAAAA>**publish**:</color>\n<color:#AAAAAA><<""iati-mq-dataset-download-request-queue-[dev|prod]"">></color>\n<color:#AAAAAA><<""iati-mq-dataset-high-priority-download-request-queue-[dev|prod]"">></color>\n<color:#AAAAAA>DATASET_DOWNLOAD_REQUEST</color>
 
 BulkDataServiceApp --> IATIMessageQueueService : **publish**:\n<<""iati-mq-dataset-check-results-topic-[dev|prod]"">>\nDATASET_CHECK_RESULT
 
-BulkDataServiceApp -up--( IATIMessageQueueService : **consume**:\n<<""iati-mq-registry-changes-sub-bds-[dev|prod]"">>\nDATASET_CREATED,\nDATASET_UPDATED,\nDATASET_DELETED,\n\nREPORTING_ORG_CREATED,\nREPORTING_ORG_UPDATED,\nREPORTING_ORG_DELETED
+BulkDataServiceApp -[#AAAAAA,dotted]up--( IATIMessageQueueService : <color:#AAAAAA>**consume**:</color>\n<color:#AAAAAA><<""iati-mq-registry-changes-sub-bds-[dev|prod]"">></color>\n<color:#AAAAAA>DATASET_CREATED,</color>\n<color:#AAAAAA>DATASET_UPDATED,</color>\n<color:#AAAAAA>DATASET_DELETED,</color>\n<color:#AAAAAA></color>\n<color:#AAAAAA>REPORTING_ORG_CREATED,</color>\n<color:#AAAAAA>REPORTING_ORG_UPDATED,</color>\n<color:#AAAAAA>REPORTING_ORG_DELETED</color>
 
-BulkDataServiceApp --( IATIMessageQueueService : **consume**:\n<<""iati-mq-dataset-download-results-sub-bds-[dev|prod]"">>\nDATASET_DOWNLOAD_ATTEMPT_RESULT
+BulkDataServiceApp -[#AAAAAA,dotted]-( IATIMessageQueueService : <color:#AAAAAA>**consume**:</color>\n<color:#AAAAAA><<""iati-mq-dataset-download-results-sub-bds-[dev|prod]"">></color>\n<color:#AAAAAA>DATASET_DOWNLOAD_ATTEMPT_RESULT</color>
 
 BulkDataServiceApp --> BulkDataServiceWebsite : upload bulk ZIP
 
-BulkDataServiceApp <--> BDSPersistentStorage : save state
+BulkDataServiceApp <--> BDSPersistentStorage : read/save state
 
-DataDownloader --( IATIMessageQueueService : **consume**:\n<<""iati-mq-dataset-download-request-queue-[dev|prod]"">>\n<<""iati-mq-dataset-high-priority-download-request-queue-[dev|prod]"">>\nDATASET_DOWNLOAD_REQUEST
+DataDownloader -[#AAAAAA,dotted]-( IATIMessageQueueService : <color:#AAAAAA>**consume**:</color>\n<color:#AAAAAA><<""iati-mq-dataset-download-request-queue-[dev|prod]"">></color>\n<color:#AAAAAA><<""iati-mq-dataset-high-priority-download-request-queue-[dev|prod]"">></color>\n<color:#AAAAAA>DATASET_DOWNLOAD_REQUEST</color>
 
-DataDownloader -> IATIMessageQueueService : **publish**:\n<<""iati-mq-dataset-download-results-topic-[dev|prod]"">>\nDATASET_DOWNLOAD_ATTEMPT_RESULT
+DataDownloader -[#AAAAAA,dotted]-> IATIMessageQueueService : <color:#AAAAAA>**publish**:</color>\n<color:#AAAAAA><<""iati-mq-dataset-download-results-topic-[dev|prod]"">></color>\n<color:#AAAAAA>DATASET_DOWNLOAD_ATTEMPT_RESULT</color>
 
-DataDownloader --> BulkDataServiceWebsite : upload individual\nIATI datasets\n(XML and ZIP)
+DataDownloader -[#AAAAAA,dotted]-> BulkDataServiceWebsite : <color:#AAAAAA>upload individual</color>\n<color:#AAAAAA>IATI datasets</color>\n<color:#AAAAAA>(XML and ZIP)</color>
+
+legend right
+**Line styles**
+|<color:#000000>──────</color> | Implemented (black, solid) |
+|<color:#AAAAAA>┈┈┈┈┈┈</color> | Not yet implemented (grey, dotted) |
+----
+**Last updated:** 2026-06-25
+endlegend
 
 @enduml
