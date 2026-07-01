@@ -57,6 +57,7 @@ components:
             dataset:
               id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
               short_name: "aidagcy-activity-3"
+              human_readable_name: "Aid Agency - Activity 3"
               source_type: "primary_source"
               licence_id: "gpl-3.0"
               url: "https://www.example.org/datasets/activity3.xml"
@@ -125,6 +126,7 @@ components:
             dataset:
               id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
               short_name: "aidagcy-activity-3"
+              human_readable_name: "Aid Agency - Activity 3 Update"
               source_type: "primary_source"
               licence_id: "gpl-3.0"
               url: "https://www.example.org/datasets/activity3.xml"
@@ -232,6 +234,7 @@ components:
             dataset:
               id: "5401c7f4-e9fd-4ce3-b184-bfe1cb71a9f8"
               short_name: "aidagcy-activity-3"
+              human_readable_name: "Aid Agency - Activity 3"
               source_type: "primary_source"
               licence_id: "gpl-3.0"
               url: "https://www.example.org/datasets/activity3.xml"
@@ -527,6 +530,7 @@ components:
       required:
         - id
         - short_name
+        - human_readable_name
         - source_type
         - url
         - last_url_update_date
@@ -542,6 +546,9 @@ components:
         short_name:
           type: string
           example: aidagcy-activity-3
+        human_readable_name:
+          type: string
+          example: Aid Agency - Activity File 3
         source_type:
           type: string
           enum:
