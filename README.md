@@ -92,3 +92,8 @@ specification files is pushed.
 ### Updating versions
 
 Note: we keep the version numbers for all files in sync, so any change to even just a single file requires bumping the version number in all the YAML file.
+
+## Updating the HTML and Overview Diagram
+
+The rendered HTML specs and the PNG of the overview diagram are both created as
+part of the CD job on merge.
